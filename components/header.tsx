@@ -1,14 +1,10 @@
-"use client";
-
 import Link from "next/link";
-import { ChevronDown, Clock, ShoppingBasket, User } from "lucide-react";
+import { ChevronDown, Clock, User } from "lucide-react";
 import { PIZZA_CATEGORIES, PIZZA_CATEGORY_LABELS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
-import { useCart } from "@/components/cart-context";
+import { CartSheet } from "@/components/cart-sheet";
 
 export function SiteHeader() {
-  const { itemCount, totalPrice } = useCart();
   return (
     <header className="border-b border-neutral-200 px-6 py-4 sm:px-10">
       <div className="flex items-center justify-between gap-6">
@@ -66,10 +62,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Button className="rounded-full">
-          <ShoppingBasket />
-          {formatPrice(totalPrice)}
-        </Button>
+        <CartSheet />
       </div>
     </header>
   );

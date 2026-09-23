@@ -159,7 +159,22 @@ export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
             size="lg"
             className="mt-2 w-full rounded-full font-semibold text-base"
             onClick={() => {
-              addItem(totalPrice);
+              const summary = [
+                size && SIZE_LABELS[size.type],
+                [option && formatLabel(option.type), ...toppings.map((topping) => formatLabel(topping.type))]
+                  .filter(Boolean)
+                  .join(", "),
+              ]
+                .filter(Boolean)
+                .join(" · ");
+
+              addItem({
+                pizzaId: pizza._id,
+                name: pizza.name,
+                img: getPizzaImageUrl(pizza.img),
+                summary,
+                price: totalPrice,
+              });
               toast.success(`${pizza.name} added to cart`);
             }}
           >
