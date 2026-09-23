@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -176,9 +177,11 @@ export function CartSheet() {
               </span>
               <span className="font-semibold">{formatPrice(totalPrice)}</span>
             </div>
-            <Button size="lg" className="w-full rounded-full" asChild>
-              <Link href="/checkout">Proceed to checkout</Link>
-            </Button>
+            <SheetClose asChild>
+              <Button size="lg" className="w-full rounded-full" asChild>
+                <Link href="/checkout">Proceed to checkout</Link>
+              </Button>
+            </SheetClose>
           </SheetFooter>
         )}
       </SheetContent>
