@@ -12,6 +12,7 @@ const CartContext = createContext<{
   addItem: (item: NewCartItem) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
+  clearCart: () => void;
 } | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -38,6 +39,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const clearCart = () => {
+    setItems([]);
+  };
+
   const itemCount = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
     [items],
@@ -56,6 +61,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         addItem,
         removeItem,
         updateQuantity,
+        clearCart,
       }}
     >
       {children}
