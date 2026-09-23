@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ChevronDown, Clock, User } from "lucide-react";
-import { PIZZA_CATEGORIES, PIZZA_CATEGORY_LABELS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "@/components/cart-sheet";
+import { CategoryNav } from "@/components/category-nav";
 
 export function SiteHeader() {
   return (
@@ -44,25 +44,11 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-4">
-        <nav className="flex flex-wrap gap-2">
-          {PIZZA_CATEGORIES.map((category, index) => (
-            <Button
-              key={category}
-              variant={index === 0 ? "default" : "outline"}
-              className={
-                index === 0
-                  ? "rounded-full border-transparent bg-black text-white hover:bg-black/80"
-                  : "rounded-full border-transparent bg-neutral-100 hover:bg-neutral-200"
-              }
-              asChild
-            >
-              <a href={`/#${category}`}>{PIZZA_CATEGORY_LABELS[category]}</a>
-            </Button>
-          ))}
-        </nav>
-
-        <CartSheet />
+      <div className="mt-6 flex items-center gap-4">
+        <CategoryNav />
+        <div className="ml-auto">
+          <CartSheet />
+        </div>
       </div>
     </header>
   );
