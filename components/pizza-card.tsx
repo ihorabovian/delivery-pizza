@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Plus, Sparkles } from "lucide-react";
 import type { Pizza } from "@/types/pizza";
 import { getPizzaImageUrl, getStartingPrice } from "@/lib/api";
@@ -35,14 +36,16 @@ export function PizzaCard({
     return (
       <Dialog>
         <DialogTrigger className="group relative col-span-2 flex h-81.5 w-full cursor-pointer flex-col justify-between overflow-hidden rounded-3xl bg-orange-500 px-6 pb-6 pt-0 text-center shadow-[0_12px_30px_rgba(244,102,40,0.18)] sm:col-span-3 lg:col-span-1 lg:w-46">
-          <div className="pr-10 relative mx-auto h-46 w-48 overflow-hidden rounded-[22px]">
+          <div className="relative mx-auto h-46 w-48 rounded-[22px]">
             <Sparkles className="absolute -left-1 top-2 z-20 size-4 rotate-12 text-yellow-200/90" />
             <Sparkles className="absolute right-1 top-6 z-20 size-5 rotate-45 text-yellow-200/90" />
             <Sparkles className="absolute bottom-3 left-4 z-20 size-3 text-yellow-200/90" />
-            <img
+            <Image
               src={getPizzaImageUrl(pizza.img)}
               alt={pizza.name}
-              className="h-full w-full object-contain object-center"
+              width={192}
+              height={184}
+              className="h-full w-full -translate-x-6 object-contain object-center"
             />
           </div>
 
@@ -65,9 +68,11 @@ export function PizzaCard({
       <DialogTrigger className="group relative flex w-full cursor-pointer flex-col gap-3 rounded-3xl bg-neutral-100 p-2 text-left transition-shadow hover:shadow-md lg:h-81.5 lg:w-46 lg:bg-transparent lg:p-0 lg:hover:shadow-none">
         <div className="relative flex aspect-12/13 w-full flex-col items-center justify-center overflow-hidden rounded-2xl bg-white pt-2 lg:aspect-auto lg:h-49.5 lg:overflow-hidden lg:rounded-3xl lg:bg-neutral-100 lg:pt-2">
           {badgeLabel && <PizzaBadge label={badgeLabel} />}
-          <img
+          <Image
             src={getPizzaImageUrl(pizza.img)}
             alt={pizza.name}
+            fill
+            sizes="(max-width: 1024px) 50vw, 184px"
             className="h-full w-full object-contain object-center"
           />
         </div>

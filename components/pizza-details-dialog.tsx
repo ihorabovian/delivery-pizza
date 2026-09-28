@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import type { Pizza, PizzaSize } from "@/types/pizza";
@@ -64,11 +65,15 @@ export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
       </DialogClose>
 
       <div className="flex items-center justify-center px-6 pt-14 sm:min-h-0 sm:bg-muted/30 sm:px-10 sm:py-10">
-        <img
-          src={getPizzaImageUrl(pizza.img)}
-          alt={pizza.name}
-          className="aspect-square w-full max-w-100 rounded-2xl object-cover"
-        />
+        <div className="relative aspect-square w-full max-w-100 overflow-hidden rounded-2xl">
+          <Image
+            src={getPizzaImageUrl(pizza.img)}
+            alt={pizza.name}
+            fill
+            sizes="(max-width: 640px) 100vw, 400px"
+            className="object-cover"
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-5 px-6 pb-8 sm:min-h-0 sm:overflow-y-auto sm:px-8 sm:py-8">
@@ -143,9 +148,11 @@ export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
                         <Check className="size-3" />
                       </span>
                     )}
-                    <img
+                    <Image
                       src={getPizzaImageUrl(item.img)}
                       alt={formatLabel(item.type)}
+                      width={56}
+                      height={56}
                       className="size-14 rounded-lg object-cover"
                     />
                     <span className="text-center text-sm font-medium leading-tight">

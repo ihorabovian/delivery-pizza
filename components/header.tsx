@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronDown, History, ShoppingBasket, User } from "lucide-react";
 import pizzaIcon from "@/app/icon.png";
+import avatarMascot from "@/public/avatar-mascot.png";
 import { PIZZA_CATEGORIES, PIZZA_CATEGORY_LABELS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
@@ -22,8 +24,8 @@ export function SiteHeader() {
             Select delivery address
             <ChevronDown className="size-4" />
           </button>
-          <img
-            src="/avatar-mascot.png"
+          <Image
+            src={avatarMascot}
             alt=""
             className="size-8 shrink-0 rounded-full bg-orange-50"
             aria-hidden
@@ -55,7 +57,7 @@ export function SiteHeader() {
             href="/"
             className="flex cursor-pointer items-center gap-1 text-l font-extrabold uppercase tracking-tight text-foreground"
           >
-            <img src={pizzaIcon.src} alt="" className="size-6" aria-hidden />
+            <Image src={pizzaIcon} alt="" className="size-6" aria-hidden />
             Pizza
           </Link>
 
