@@ -10,7 +10,14 @@ export function PizzaBanner({ className }: { className?: string }) {
         className,
       )}
     >
-      <Image src={banner} alt="" fill className="object-cover" aria-hidden />
+      <Image
+        src={banner}
+        alt=""
+        fill
+        sizes="272px"
+        className="object-cover"
+        aria-hidden
+      />
       <div />
       <p className="relative z-10 max-w-[220px] text-2xl font-bold leading-8 tracking-[-0.04em] text-white">
         Enjoy our pizza from anywhere in the world

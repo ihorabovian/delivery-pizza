@@ -19,7 +19,11 @@ export default async function Home() {
         const isPizza = category === "pizza";
 
         return (
-          <section key={category} id={category} className="mb-16 scroll-mt-24 lg:mb-12">
+          <section
+            key={category}
+            id={category}
+            className="mb-16 scroll-mt-[var(--header-height)] lg:mb-12"
+          >
             <h2 className="mb-6 hidden text-2xl font-semibold sm:block">
               {PIZZA_CATEGORY_LABELS[category]}
             </h2>
