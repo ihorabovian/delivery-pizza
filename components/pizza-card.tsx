@@ -45,7 +45,7 @@ export function PizzaCard({
               alt={pizza.name}
               width={192}
               height={184}
-              className="h-full w-full -translate-x-6 object-contain object-center"
+              className="h-full w-full translate-x-2 sm:-translate-x-6 object-contain object-center"
             />
           </div>
 
