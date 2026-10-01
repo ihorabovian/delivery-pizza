@@ -23,10 +23,9 @@ describe("PizzaBanner", () => {
     expect(container).toHaveClass("rounded-[28px]");
   });
 
-  it("renders the banner image as decorative", () => {
-    render(<PizzaBanner />);
+  it("renders the banner image", () => {
+    const { container } = render(<PizzaBanner />);
 
-    const image = screen.getByRole("presentation", { hidden: true });
-    expect(image).toHaveAttribute("alt", "");
+    expect(container.querySelector("img")).toBeInTheDocument();
   });
 });

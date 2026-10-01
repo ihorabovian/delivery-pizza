@@ -3,13 +3,7 @@ import { vi } from "vitest";
 import type { ImageProps } from "next/image";
 
 vi.mock("next/image", () => ({
-  default: ({
-    src,
-    alt,
-    fill,
-    sizes,
-    className,
-  }: ImageProps) => {
+  default: ({ src, alt, fill, sizes, className }: ImageProps) => {
     const resolvedSrc =
       typeof src === "string"
         ? src
@@ -37,5 +31,4 @@ class MockResizeObserver {
 
 global.IntersectionObserver =
   MockIntersectionObserver as unknown as typeof IntersectionObserver;
-global.ResizeObserver =
-  MockResizeObserver as unknown as typeof ResizeObserver;
+global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
