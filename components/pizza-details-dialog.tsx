@@ -126,7 +126,7 @@ export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
         {pizza.ingredients.length > 0 && (
           <div>
             <p className="mb-3 text-lg font-bold text-foreground">
-              Добавить по вкусу
+              Add toppings
             </p>
             <ToggleGroup
               type="multiple"
@@ -229,7 +229,7 @@ export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
             className="hidden w-full rounded-2xl font-semibold text-base sm:mt-auto sm:flex"
             onClick={addToCart}
           >
-            Добавить за {formatPrice(totalPrice)}
+            Add for {formatPrice(totalPrice)}
           </Button>
         </DialogClose>
       </div>
