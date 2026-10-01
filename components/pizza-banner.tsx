@@ -12,7 +12,7 @@ export function PizzaBanner({ className }: { className?: string }) {
     >
       <Image
         src={banner}
-        alt=""
+        alt="Illustration of pizza delivery around the world"
         fill
         sizes="272px"
         className="object-cover"
