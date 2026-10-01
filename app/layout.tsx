@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import { SiteHeader } from "@/components/header";
 import { SiteFooter } from "@/components/footer";
+import { BottomNav } from "@/components/bottom-nav";
 import "./globals.css";
 import { CartProvider } from "@/components/cart-context";
 import { CatalogProvider } from "@/components/catalog-context";
@@ -35,14 +36,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col">
-        <CatalogProvider catalog={catalog}>
-          <CartProvider>
-            <SiteHeader />
-            {children}
-            <SiteFooter />
-          </CartProvider>
-        </CatalogProvider>
+      <body className="min-h-full flex flex-col pb-24 sm:pb-0">
+        <CartProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+          <BottomNav />
+        </CartProvider>
         <Toaster />
       </body>
     </html>

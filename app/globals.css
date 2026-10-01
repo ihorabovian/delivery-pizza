@@ -4,6 +4,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+  scroll-behavior: smooth;
+  --header-height: 140px;
+}
+
+
 @theme inline {
     --font-heading: var(--font-manrope);
     --font-sans: var(--font-manrope);
