@@ -22,46 +22,42 @@ function PizzaBadge({ label }: { label: string }) {
   );
 }
 
-export function PizzaCard({
-  pizza,
-  featured = false,
-}: {
-  pizza: Pizza;
-  featured?: boolean;
-}) {
+function FeaturedPizzaCard({ pizza }: { pizza: Pizza }) {
+  const startingPrice = getStartingPrice(pizza);
+
+  return (
+    <Dialog>
+      <DialogTrigger className="group relative col-span-2 flex h-81.5 w-full cursor-pointer flex-col justify-between overflow-hidden rounded-3xl bg-orange-500 px-6 pb-6 pt-0 text-center shadow-[0_12px_30px_rgba(244,102,40,0.18)] sm:col-span-3 lg:col-span-1 lg:w-46">
+        <div className="relative mx-auto h-46 w-48 rounded-[22px]">
+          <Sparkles className="absolute -left-1 top-2 z-20 size-4 rotate-12 text-yellow-200/90" />
+          <Sparkles className="absolute right-1 top-6 z-20 size-5 rotate-45 text-yellow-200/90" />
+          <Sparkles className="absolute bottom-3 left-4 z-20 size-3 text-yellow-200/90" />
+          <Image
+            src={getPizzaImageUrl(pizza.img)}
+            alt={pizza.name}
+            width={192}
+            height={184}
+            className="h-full w-full translate-x-2 sm:-translate-x-6 object-contain object-center"
+          />
+        </div>
+
+        <h3 className="text-lg font-bold leading-6 text-white">
+          {pizza.name}
+        </h3>
+
+        <span className="flex h-10 w-full shrink-0 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-[#232323]">
+          from {formatPrice(startingPrice)}
+        </span>
+      </DialogTrigger>
+
+      <PizzaDetailsDialog pizza={pizza} />
+    </Dialog>
+  );
+}
+
+function RegularPizzaCard({ pizza }: { pizza: Pizza }) {
   const startingPrice = getStartingPrice(pizza);
   const badgeLabel = getBadgeLabel(pizza);
-
-  if (featured) {
-    return (
-      <Dialog>
-        <DialogTrigger className="group relative col-span-2 flex h-81.5 w-full cursor-pointer flex-col justify-between overflow-hidden rounded-3xl bg-orange-500 px-6 pb-6 pt-0 text-center shadow-[0_12px_30px_rgba(244,102,40,0.18)] sm:col-span-3 lg:col-span-1 lg:w-46">
-          <div className="relative mx-auto h-46 w-48 rounded-[22px]">
-            <Sparkles className="absolute -left-1 top-2 z-20 size-4 rotate-12 text-yellow-200/90" />
-            <Sparkles className="absolute right-1 top-6 z-20 size-5 rotate-45 text-yellow-200/90" />
-            <Sparkles className="absolute bottom-3 left-4 z-20 size-3 text-yellow-200/90" />
-            <Image
-              src={getPizzaImageUrl(pizza.img)}
-              alt={pizza.name}
-              width={192}
-              height={184}
-              className="h-full w-full translate-x-2 sm:-translate-x-6 object-contain object-center"
-            />
-          </div>
-
-          <h3 className="text-lg font-bold leading-6 text-white">
-            {pizza.name}
-          </h3>
-
-          <span className="flex h-10 w-full shrink-0 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-[#232323]">
-            from {formatPrice(startingPrice)}
-          </span>
-        </DialogTrigger>
-
-        <PizzaDetailsDialog pizza={pizza} />
-      </Dialog>
-    );
-  }
 
   return (
     <Dialog>
@@ -93,5 +89,19 @@ export function PizzaCard({
 
       <PizzaDetailsDialog pizza={pizza} />
     </Dialog>
+  );
+}
+
+export function PizzaCard({
+  pizza,
+  featured = false,
+}: {
+  pizza: Pizza;
+  featured?: boolean;
+}) {
+  return featured ? (
+    <FeaturedPizzaCard pizza={pizza} />
+  ) : (
+    <RegularPizzaCard pizza={pizza} />
   );
 }
