@@ -50,7 +50,26 @@ export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
   const { addItem } = useCart();
 
   const addToCart = () => {
-    addItem(totalPrice);
+    const summaryParts = [
+      size ? `${size.volume} cm` : null,
+      option ? formatLabel(option.type) : null,
+      toppings.length > 0
+        ? toppings.map((item) => formatLabel(item.type)).join(", ")
+        : null,
+    ].filter(Boolean);
+
+    addItem({
+      pizzaId: pizza._id,
+      category: pizza.category,
+      size: size?.type ?? "",
+      option: option?.type ?? "",
+      toppings: toppings.map((item) => item.type),
+      name: pizza.name,
+      img: getPizzaImageUrl(pizza.img),
+      summary: summaryParts.join(", "),
+      description: pizza.description,
+      price: totalPrice,
+    });
     toast.success(`${pizza.name} added to cart`);
   };
 
