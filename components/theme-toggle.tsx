@@ -43,7 +43,7 @@ export function ThemeToggle() {
       <ToggleGroupItem
         value="light"
         aria-label="Light theme"
-        size="icon-sm"
+        size="sm"
         className="rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
       >
         <Sun className="size-4" />
@@ -51,7 +51,7 @@ export function ThemeToggle() {
       <ToggleGroupItem
         value="system"
         aria-label="System theme"
-        size="icon-sm"
+        size="sm"
         className="rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
       >
         <Monitor className="size-4" />
@@ -59,7 +59,7 @@ export function ThemeToggle() {
       <ToggleGroupItem
         value="dark"
         aria-label="Dark theme"
-        size="icon-sm"
+        size="sm"
         className="rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
       >
         <Moon className="size-4" />

@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const catalog = await fetchPizzaCatalog();
+  const catalog = await fetchPizzaCatalog().catch(() => []);
 
   return (
     <html
@@ -38,12 +38,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full flex flex-col pb-24 sm:pb-0">
         <CartProvider>
-          <SiteHeader />
-          {children}
-          <SiteFooter />
-          <BottomNav />
+          <CatalogProvider catalog={catalog}>
+            <SiteHeader />
+            {children}
+            <SiteFooter />
+            <BottomNav />
+          </CatalogProvider>
         </CartProvider>
-        <Toaster />
+        <Toaster position="top-center" />
       </body>
     </html>
   );

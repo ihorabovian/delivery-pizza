@@ -18,7 +18,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="mx-auto flex w-full max-w-82 flex-col items-center gap-6 px-4 py-16 text-center sm:px-8 lg:max-w-144.5 lg:px-10">
+    <div className="mx-auto flex w-full max-w-82 flex-col items-center gap-6 px-4 pt-16 text-center sm:px-8 lg:max-w-144.5 lg:px-10">
       <Image
         src={errorMascotMobile}
         alt=""

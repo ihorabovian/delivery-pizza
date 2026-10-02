@@ -5,7 +5,7 @@ import notFoundMascot from "@/public/not-found-mascot.svg";
 
 export default function NotFound() {
   return (
-    <div className="mx-auto flex w-full max-w-163.5 flex-col items-center gap-6 px-4 py-16 text-center sm:px-8 lg:px-10">
+    <div className="mx-auto flex w-full max-w-163.5 flex-col items-center gap-6 px-4 pt-16 text-center sm:px-8 lg:px-10">
       <div className="flex items-center justify-center gap-4">
         <span className="text-6xl font-extrabold leading-none text-foreground lg:text-[164px]">
           4
