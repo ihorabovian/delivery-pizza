@@ -1,8 +1,8 @@
 "use client";
 
-import { History, Pizza, ShoppingBasket, User } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { History, Pizza, User } from "lucide-react";
 import { useCart } from "@/components/cart-context";
+import { CartSheet } from "@/components/cart-sheet";
 
 const NAV_ITEMS = [
   { label: "Home", icon: Pizza, active: true },
@@ -11,18 +11,12 @@ const NAV_ITEMS = [
 ];
 
 export function BottomNav() {
-  const { itemCount, totalPrice } = useCart();
+  const { itemCount } = useCart();
 
   return (
     <div className="fixed inset-x-4 bottom-4 z-40 flex flex-col items-end gap-3 sm:hidden">
       {itemCount > 0 && (
-        <button
-          type="button"
-          className="flex h-13 items-center gap-2 rounded-full bg-[#f14e1d] px-6 text-sm font-medium text-white shadow-lg"
-        >
-          <ShoppingBasket className="size-4" />
-          {formatPrice(totalPrice)}
-        </button>
+        <CartSheet triggerClassName="h-13 px-6 shadow-lg" />
       )}
 
       <nav className="flex w-full rounded-full bg-neutral-50 p-1 shadow-lg">
