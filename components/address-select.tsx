@@ -42,7 +42,7 @@ function debounce<Args extends unknown[], Result>(
 export function AddressSelect({
   value,
   onChange,
-  placeholder = "Enter delivery address",
+  placeholder = "Select delivery address",
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -70,11 +70,13 @@ export function AddressSelect({
       unstyled
       classNames={{
         control: () =>
-          "border-none bg-transparent shadow-none min-h-0 cursor-text",
-        valueContainer: () => "p-0",
+          "border-none bg-transparent shadow-none min-h-0 cursor-text flex-nowrap",
+        valueContainer: () => "p-0 flex-nowrap",
         input: () => "text-base font-medium text-foreground m-0 p-0",
-        placeholder: () => "text-base font-medium text-[#f14e1d] m-0",
-        singleValue: () => "text-base font-medium text-foreground m-0",
+        placeholder: () =>
+          "text-base font-medium text-foreground m-0 truncate",
+        singleValue: () =>
+          "text-base font-medium text-foreground m-0 truncate",
         indicatorsContainer: () => "hidden",
         menu: () =>
           "mt-2 rounded-xl border border-border bg-background shadow-lg overflow-hidden z-50",

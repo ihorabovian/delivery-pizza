@@ -4,10 +4,11 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ChevronDown, History, User } from "lucide-react";
+import { History, User } from "lucide-react";
 import pizzaIcon from "@/app/icon.png";
 import avatarMascot from "@/public/avatar-mascot.png";
 import { PIZZA_CATEGORIES, PIZZA_CATEGORY_LABELS } from "@/lib/constants";
+import { AddressPicker } from "@/components/address-picker";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "@/components/cart-sheet";
 import type { PizzaCategory } from "@/types/pizza";
@@ -96,13 +97,7 @@ export function SiteHeader() {
       {/* Mobile — compact address row + category chips */}
       <div className="sm:hidden">
         <div className="flex items-center justify-between gap-4">
-          <button
-            type="button"
-            className="flex cursor-pointer items-center gap-2 text-sm text-foreground hover:text-foreground/80"
-          >
-            Select delivery address
-            <ChevronDown className="size-4" />
-          </button>
+          <AddressPicker className="w-40" />
           <Image
             src={avatarMascot}
             alt=""
@@ -149,13 +144,7 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-4">
-              <button
-                type="button"
-                className="flex cursor-pointer items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80"
-              >
-                Select delivery address
-                <ChevronDown className="size-4" />
-              </button>
+              <AddressPicker className="w-60" />
               <button
                 type="button"
                 aria-label="Order history"
