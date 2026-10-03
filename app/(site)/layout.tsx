@@ -3,7 +3,8 @@ import { Manrope } from "next/font/google";
 import { SiteHeader } from "@/components/header";
 import { SiteFooter } from "@/components/footer";
 import { BottomNav } from "@/components/bottom-nav";
-import "./globals.css";
+import "../globals.css";
+import { AddressProvider } from "@/components/address-context";
 import { CartProvider } from "@/components/cart-context";
 import { CatalogProvider } from "@/components/catalog-context";
 import { Toaster } from "@/components/ui/sonner";
@@ -37,14 +38,16 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col pb-24 sm:pb-0">
-        <CartProvider>
-          <CatalogProvider catalog={catalog}>
-            <SiteHeader />
-            {children}
-            <SiteFooter />
-            <BottomNav />
-          </CatalogProvider>
-        </CartProvider>
+        <AddressProvider>
+          <CartProvider>
+            <CatalogProvider catalog={catalog}>
+              <SiteHeader />
+              {children}
+              <SiteFooter />
+              <BottomNav />
+            </CatalogProvider>
+          </CartProvider>
+        </AddressProvider>
         <Toaster position="top-center" />
       </body>
     </html>
