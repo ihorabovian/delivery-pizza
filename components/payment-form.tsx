@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import pizzaIcon from "@/app/icon.png";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
+import { Check } from "lucide-react";
+import { useAddressStore } from "@/stores/address-store";
+import { useCartStore } from "@/stores/cart-store";
+import { useOrderStore } from "@/stores/order-store";
 
 function formatCardNumber(value: string) {
   return value
@@ -33,11 +38,77 @@ export function PaymentForm({
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
   const [paying, setPaying] = useState(false);
+  const [paid, setPaid] = useState(false);
 
   const isValid =
     cardNumber.replace(/\s/g, "").length >= 8 &&
     expiry.length === 5 &&
     cvv.length >= 3;
+
+  // Demo payment: no gateway yet, so "success" is simulated after a short delay
+  const handlePay = () => {
+    setPaying(true);
+    setTimeout(() => {
+      const { items, clearCart } = useCartStore.getState();
+      useOrderStore.getState().addOrder({
+        number: orderNumber,
+        items,
+        total: amount,
+        address: useAddressStore.getState().address,
+        createdAt: new Date().toISOString(),
+      });
+      clearCart();
+      setPaid(true);
+    }, 1000);
+  };
+
+  if (paid) {
+    return (
+      <div className="flex w-full max-w-104.5 flex-col gap-8">
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center gap-2">
+            <span className="flex size-8 items-center justify-center rounded-full bg-green-500 text-white">
+              <Check className="size-5" aria-hidden />
+            </span>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Payment successful
+            </h1>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <span className="text-sm text-muted-foreground">Service</span>
+              <div className="flex items-center gap-1">
+                <Image src={pizzaIcon} alt="" className="size-6" aria-hidden />
+                <span className="text-base font-extrabold uppercase">Pizza</span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm text-muted-foreground">Amount</span>
+              <span className="text-2xl font-normal">{formatPrice(amount)}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm text-muted-foreground">Order number</span>
+              <span className="text-base">{orderNumber}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <Button
+            asChild
+            size="lg"
+            className="h-13 w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
+          >
+            <Link href={`/order/${orderNumber}`}>Back to site</Link>
+          </Button>
+          <p className="text-sm text-muted-foreground">
+            This payment is not real. No money was charged.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-104.5">
@@ -121,7 +192,7 @@ export function PaymentForm({
         size="lg"
         className="mt-6 h-13 w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
         disabled={!isValid || paying}
-        onClick={() => setPaying(true)}
+        onClick={handlePay}
       >
         {paying ? "Processing…" : `Pay ${formatPrice(amount)}`}
       </Button>

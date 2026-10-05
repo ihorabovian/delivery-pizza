@@ -4,8 +4,7 @@ import { SiteHeader } from "@/components/header";
 import { SiteFooter } from "@/components/footer";
 import { BottomNav } from "@/components/bottom-nav";
 import "../globals.css";
-import { AddressProvider } from "@/components/address-context";
-import { CartProvider } from "@/components/cart-context";
+import { StoreRehydrate } from "@/components/store-rehydrate";
 import { CatalogProvider } from "@/components/catalog-context";
 import { Toaster } from "@/components/ui/sonner";
 import { fetchPizzaCatalog } from "@/lib/api";
@@ -38,16 +37,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col pb-24 sm:pb-0">
-        <AddressProvider>
-          <CartProvider>
-            <CatalogProvider catalog={catalog}>
-              <SiteHeader />
-              {children}
-              <SiteFooter />
-              <BottomNav />
-            </CatalogProvider>
-          </CartProvider>
-        </AddressProvider>
+        <CatalogProvider catalog={catalog}>
+          <StoreRehydrate />
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+          <BottomNav />
+        </CatalogProvider>
         <Toaster position="top-center" />
       </body>
     </html>

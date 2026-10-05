@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "../globals.css";
+import { StoreRehydrate } from "@/components/store-rehydrate";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -30,7 +31,10 @@ export default function PaymentLayout({
           }}
         />
       </head>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <StoreRehydrate />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,11 +1,11 @@
 "use client";
 
 import { AddressSelect } from "@/components/address-select";
-import { useAddress } from "@/components/address-context";
+import { useAddressStore } from "@/stores/address-store";
 import { cn } from "@/lib/utils";
 
 export function AddressPicker({ className }: { className?: string }) {
-  const { address, setAddress } = useAddress();
+  const { address, setAddress } = useAddressStore();
 
   return (
     <div className={cn("w-48", className)}>

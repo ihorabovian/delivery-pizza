@@ -4,8 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Minus, Plus, ShoppingBasket, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { useCart } from "@/components/cart-context";
 import { useCatalog } from "@/components/catalog-context";
+import {
+  selectItemCount,
+  selectTotalPrice,
+  useCartStore,
+} from "@/stores/cart-store";
 import { getPizzaImageUrl, getStartingPrice } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { cn, formatPrice } from "@/lib/utils";
@@ -20,8 +24,9 @@ import {
 } from "@/components/ui/sheet";
 
 export function CartSheet({ triggerClassName }: { triggerClassName?: string }) {
-  const { items, itemCount, totalPrice, addItem, removeItem, updateQuantity } =
-    useCart();
+  const { items, addItem, removeItem, updateQuantity } = useCartStore();
+  const itemCount = useCartStore(selectItemCount);
+  const totalPrice = useCartStore(selectTotalPrice);
   const catalog = useCatalog();
 
   const recommendations = ["breakfast", "wings", "milkshake"]
