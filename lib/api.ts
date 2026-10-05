@@ -37,7 +37,9 @@ export async function calculatePizzaOrder(
   const data = await response.json();
 
   if (!response.ok || !data.success) {
-    throw new Error(data.reason ?? "Failed to calculate order");
+    // Business errors come as `reason`, validation errors as `message` (string or string[])
+    const message = data.reason ?? [data.message].flat().join(", ");
+    throw new Error(message || "Failed to calculate order");
   }
 
   return data;

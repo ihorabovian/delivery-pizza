@@ -20,7 +20,7 @@ export type PizzaOrderedItem = {
   category: PizzaCategory;
   quantity: number;
   size: string;
-  option: string;
+  option?: string;
   toppings: string[];
 };
 

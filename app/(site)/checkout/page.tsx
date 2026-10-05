@@ -2,11 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ChevronRight, Check, Plus } from "lucide-react";
 import { AddressSelect } from "@/components/address-select";
-import { useAddress } from "@/components/address-context";
-import { useCart } from "@/components/cart-context";
+import { useAddressStore } from "@/stores/address-store";
+import {
+  selectItemCount,
+  selectTotalPrice,
+  useCartStore,
+} from "@/stores/cart-store";
 import { Button } from "@/components/ui/button";
 import { calculatePizzaOrder } from "@/lib/api";
 import { cn, formatDate, formatPrice } from "@/lib/utils";
@@ -19,7 +24,8 @@ function toOrderedItem(item: CartItem) {
     category: item.category,
     quantity: item.quantity,
     size: item.size,
-    option: item.option,
+    // Breakfast and wings have no options; the API rejects an empty string
+    ...(item.option ? { option: item.option } : {}),
     toppings: item.toppings,
   };
 }
@@ -63,10 +69,12 @@ function BrandLogo() {
 }
 
 export default function CheckoutPage() {
-  const { items, itemCount, totalPrice, clearCart } = useCart();
-  const { address, setAddress } = useAddress();
+  const router = useRouter();
+  const { items } = useCartStore();
+  const itemCount = useCartStore(selectItemCount);
+  const totalPrice = useCartStore(selectTotalPrice);
+  const { address, setAddress } = useAddressStore();
   const [phone, setPhone] = useState("");
-  const [placed, setPlaced] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "jbpay">("card");
   const [payWithoutSaving, setPayWithoutSaving] = useState(false);
   const [calculation, setCalculation] = useState<CalculateOrderResponse | null>(
@@ -103,29 +111,9 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = () => {
     if (!address.trim()) return;
-    setPlaced(true);
-    clearCart();
+    const orderNumber = String(Math.floor(1000 + Math.random() * 9000));
+    router.push(`/payment?amount=${finalTotalPrice}&order=${orderNumber}`);
   };
-
-  if (placed) {
-    return (
-      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10 sm:px-10">
-        <Breadcrumb step="placed" />
-        <div className="mt-16 flex flex-col items-center gap-3 text-center">
-          <h1 className="text-2xl font-bold tracking-tight">Order placed!</h1>
-          <p className="text-muted-foreground">
-            We&apos;re getting your order ready. It will arrive at {address}.
-          </p>
-          <Button
-            asChild
-            className="mt-4 h-13 rounded-full bg-[#f14e1d] px-6 text-white hover:bg-[#f14e1d]/90"
-          >
-            <Link href="/">Back to menu</Link>
-          </Button>
-        </div>
-      </main>
-    );
-  }
 
   if (items.length === 0) {
     return (
