@@ -145,13 +145,13 @@ export function SiteHeader() {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-4">
               <AddressPicker className="w-60" />
-              <button
-                type="button"
+              <Link
+                href="/orders"
                 aria-label="Order history"
                 className="flex size-6 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-foreground hover:bg-neutral-200"
               >
                 <History className="size-5" />
-              </button>
+              </Link>
               <button
                 type="button"
                 aria-label="Account"
