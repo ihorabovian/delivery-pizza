@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import { Check } from "lucide-react";
 import { useAddressStore } from "@/stores/address-store";
+import { useCardStore } from "@/stores/card-store";
 import { useCartStore } from "@/stores/cart-store";
 import { useOrderStore } from "@/stores/order-store";
 
@@ -57,6 +58,7 @@ export function PaymentForm({
         address: useAddressStore.getState().address,
         createdAt: new Date().toISOString(),
       });
+      useCardStore.getState().addCard(cardNumber.replace(/\s/g, "").slice(-4));
       clearCart();
       setPaid(true);
     }, 1000);
