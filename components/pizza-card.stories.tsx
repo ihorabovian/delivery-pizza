@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PizzaCard } from "./pizza-card";
-import { CartProvider } from "@/components/cart-context";
 import { Toaster } from "@/components/ui/sonner";
 import type { Pizza } from "@/types/pizza";
 
@@ -58,12 +57,12 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <CartProvider>
+      <>
         <div className="w-52 p-4">
           <Story />
         </div>
         <Toaster position="top-center" />
-      </CartProvider>
+      </>
     ),
   ],
 } satisfies Meta<typeof PizzaCard>;
