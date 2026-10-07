@@ -1,15 +1,10 @@
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
+import { persistStorage } from "@/stores/storage";
 
 type AddressState = {
   address: string;
   setAddress: (address: string) => void;
-};
-
-const noopStorage = {
-  getItem: () => null,
-  setItem: () => {},
-  removeItem: () => {},
 };
 
 export const useAddressStore = create<AddressState>()(
@@ -20,9 +15,7 @@ export const useAddressStore = create<AddressState>()(
     }),
     {
       name: "address",
-      storage: createJSONStorage(() =>
-        typeof window !== "undefined" ? localStorage : noopStorage,
-      ),
+      storage: persistStorage,
       skipHydration: true,
     },
   ),

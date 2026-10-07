@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
+import { persistStorage } from "@/stores/storage";
 import type { CartItem } from "@/types/cart";
 
 export type Order = {
@@ -20,12 +21,6 @@ type OrderState = {
 
 export const isActiveOrder = (order: Order) => order.status !== "cancelled";
 
-const noopStorage = {
-  getItem: () => null,
-  setItem: () => {},
-  removeItem: () => {},
-};
-
 export const useOrderStore = create<OrderState>()(
   persist(
     (set) => ({
@@ -44,9 +39,7 @@ export const useOrderStore = create<OrderState>()(
     }),
     {
       name: "orders",
-      storage: createJSONStorage(() =>
-        typeof window !== "undefined" ? localStorage : noopStorage,
-      ),
+      storage: persistStorage,
       skipHydration: true,
     },
   ),

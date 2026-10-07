@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
+import { persistStorage } from "@/stores/storage";
 import type { CartItem } from "@/types/cart";
 
 type NewCartItem = Omit<CartItem, "id" | "quantity">;
@@ -10,12 +11,6 @@ type CartState = {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-};
-
-const noopStorage = {
-  getItem: () => null,
-  setItem: () => {},
-  removeItem: () => {},
 };
 
 export const useCartStore = create<CartState>()(
@@ -47,11 +42,9 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: "cart",
-      storage: createJSONStorage(() =>
-        typeof window !== "undefined" ? localStorage : noopStorage,
-      ),
+      storage: persistStorage,
       partialize: (state) => ({ items: state.items }),
-      // Restored in an effect (see CartRehydrate), not before the first render,
+      // Restored in an effect (see StoreRehydrate), not before the first render,
       // so server HTML and the first client render match.
       skipHydration: true,
     },

@@ -1,20 +1,15 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatPrice } from "@/lib/utils";
+import { useHydrated } from "@/stores/use-hydrated";
 import { useOrderStore } from "@/stores/order-store";
 
 export function OrderStatus({ number }: { number: string }) {
-  // Orders are restored from localStorage after mount (see StoreRehydrate)
-  const hydrated = useSyncExternalStore(
-    (onChange) => useOrderStore.persist.onFinishHydration(onChange),
-    () => useOrderStore.persist.hasHydrated(),
-    () => false,
-  );
+  const hydrated = useHydrated(useOrderStore.persist);
   const order = useOrderStore((state) =>
     state.orders.find((item) => item.number === number),
   );
@@ -65,7 +60,9 @@ export function OrderStatus({ number }: { number: string }) {
               </span>
               <span className="font-medium">{item.name}</span>
               <p className="text-sm text-muted-foreground">{item.summary}</p>
-              <p className="text-sm text-muted-foreground">{item.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {item.description}
+              </p>
             </div>
           </div>
         ))}
