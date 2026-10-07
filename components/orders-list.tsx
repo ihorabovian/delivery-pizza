@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight, Pizza } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn, formatDate, formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { OrderCard } from "@/components/order-card";
+import { useHydrated } from "@/stores/use-hydrated";
 import { isActiveOrder, useOrderStore } from "@/stores/order-store";
 
 const TABS = [
@@ -19,12 +20,7 @@ type TabKey = (typeof TABS)[number]["key"];
 const SCROLL_STEP = 520;
 
 export function OrdersList() {
-  // Orders are restored from localStorage after mount (see StoreRehydrate)
-  const hydrated = useSyncExternalStore(
-    (onChange) => useOrderStore.persist.onFinishHydration(onChange),
-    () => useOrderStore.persist.hasHydrated(),
-    () => false,
-  );
+  const hydrated = useHydrated(useOrderStore.persist);
   const orders = useOrderStore((state) => state.orders);
   const cancelOrder = useOrderStore((state) => state.cancelOrder);
   const [tab, setTab] = useState<TabKey>("active");
@@ -107,60 +103,16 @@ export function OrdersList() {
           className="mt-6 flex snap-x gap-10 overflow-x-auto pb-2"
         >
           {visibleOrders.map((order) => (
-            <article
+            <OrderCard
               key={order.number}
-              className="flex w-full shrink-0 snap-start flex-col gap-4 rounded-3xl bg-muted p-6 sm:w-120"
-            >
-              <div className="flex flex-col">
-                <span className="text-sm text-muted-foreground">
-                  Order №{order.number}
-                </span>
-                <span>{formatDate(new Date(order.createdAt))}</span>
-              </div>
-
-              <ul className="flex flex-col gap-4">
-                {order.items.map((item) => (
-                  <li key={item.id} className="flex items-center gap-4">
-                    <Image
-                      src={item.img}
-                      alt={item.name}
-                      width={66}
-                      height={69}
-                      className="size-16 shrink-0 object-contain"
-                    />
-                    <div className="flex flex-col">
-                      <span>{formatPrice(item.price * item.quantity)}</span>
-                      <span>{item.name}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-auto flex flex-col">
-                <span className="text-sm text-muted-foreground">Total</span>
-                <span className="text-2xl">{formatPrice(order.total)}</span>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-13 w-full rounded-full bg-[#f14e1d] text-white hover:bg-[#f14e1d]/90"
-                >
-                  <Link href={`/order/${order.number}`}>Details</Link>
-                </Button>
-                {isActiveOrder(order) && (
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={() => cancelOrder(order.number)}
-                    className="h-13 w-full cursor-pointer rounded-full bg-transparent"
-                  >
-                    Cancel order
-                  </Button>
-                )}
-              </div>
-            </article>
+              order={order}
+              onCancel={
+                isActiveOrder(order)
+                  ? () => cancelOrder(order.number)
+                  : undefined
+              }
+              className="w-full shrink-0 snap-start sm:w-120"
+            />
           ))}
         </div>
       )}
