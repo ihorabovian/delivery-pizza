@@ -12,6 +12,7 @@ import {
   selectTotalPrice,
   useCartStore,
 } from "@/stores/cart-store";
+import { useHydrated } from "@/stores/use-hydrated";
 import { Button } from "@/components/ui/button";
 import { calculatePizzaOrder } from "@/lib/api";
 import { cn, formatDate, formatPrice } from "@/lib/utils";
@@ -70,6 +71,7 @@ function BrandLogo() {
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const cartHydrated = useHydrated(useCartStore.persist);
   const { items } = useCartStore();
   const itemCount = useCartStore(selectItemCount);
   const totalPrice = useCartStore(selectTotalPrice);
@@ -114,6 +116,9 @@ export default function CheckoutPage() {
     const orderNumber = String(Math.floor(1000 + Math.random() * 9000));
     router.push(`/payment?amount=${finalTotalPrice}&order=${orderNumber}`);
   };
+
+  // Wait for the persisted cart, otherwise "empty cart" flashes on reload
+  if (!cartHydrated) return null;
 
   if (items.length === 0) {
     return (
