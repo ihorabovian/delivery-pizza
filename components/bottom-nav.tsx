@@ -6,11 +6,10 @@ import { History, Pizza, User } from "lucide-react";
 import { CartSheet } from "@/components/cart-sheet";
 import { selectItemCount, useCartStore } from "@/stores/cart-store";
 
-// Profile has no page yet, so it stays a plain button
 const NAV_ITEMS = [
   { label: "Home", icon: Pizza, href: "/" },
   { label: "Orders", icon: History, href: "/orders" },
-  { label: "Profile", icon: User, href: undefined },
+  { label: "Profile", icon: User, href: "/profile" },
 ];
 
 const itemClassName = (active: boolean) =>
@@ -29,23 +28,16 @@ export function BottomNav() {
       )}
 
       <nav className="flex w-full rounded-full bg-neutral-50 p-1 shadow-lg">
-        {NAV_ITEMS.map(({ label, icon: Icon, href }) =>
-          href ? (
-            <Link
-              key={label}
-              href={href}
-              className={itemClassName(pathname === href)}
-            >
-              <Icon className="size-6" />
-              <span className="text-xs">{label}</span>
-            </Link>
-          ) : (
-            <button key={label} type="button" className={itemClassName(false)}>
-              <Icon className="size-6" />
-              <span className="text-xs">{label}</span>
-            </button>
-          ),
-        )}
+        {NAV_ITEMS.map(({ label, icon: Icon, href }) => (
+          <Link
+            key={label}
+            href={href}
+            className={itemClassName(pathname === href)}
+          >
+            <Icon className="size-6" />
+            <span className="text-xs">{label}</span>
+          </Link>
+        ))}
       </nav>
     </div>
   );

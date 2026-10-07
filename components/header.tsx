@@ -152,13 +152,13 @@ export function SiteHeader() {
               >
                 <History className="size-5" />
               </Link>
-              <button
-                type="button"
-                aria-label="Account"
+              <Link
+                href="/profile"
+                aria-label="Profile"
                 className="flex size-6 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-foreground hover:bg-neutral-200"
               >
                 <User className="size-5" />
-              </button>
+              </Link>
             </div>
             <Button className="h-auto rounded-full bg-orange-50 px-5 py-2 text-base text-[#f14e1d] hover:bg-orange-100">
               Log in
