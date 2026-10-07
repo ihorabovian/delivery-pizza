@@ -19,7 +19,13 @@ type OrderState = {
   cancelOrder: (number: string) => void;
 };
 
-export const isActiveOrder = (order: Order) => order.status !== "cancelled";
+// No real delivery tracking yet: an order counts as active for an hour
+// after it was placed, then moves to history
+const ACTIVE_ORDER_MS = 60 * 60 * 1000;
+
+export const isActiveOrder = (order: Order) =>
+  order.status !== "cancelled" &&
+  Date.now() - Date.parse(order.createdAt) < ACTIVE_ORDER_MS;
 
 export const useOrderStore = create<OrderState>()(
   persist(
