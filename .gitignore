@@ -40,8 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# agent skills
-/.agents/
-/.claude/skills
-skills-lock.json
+
 .vitest/
