@@ -1,4 +1,5 @@
 import type { Pizza, PizzaCategory } from "@/types/pizza";
+import type { CalculateOrderResponse, PizzaOrderedItem } from "@/types/cart";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -22,6 +23,26 @@ export function getStartingPrice(pizza: Pizza): number {
 
 export function getPizzaImageUrl(path: string): string {
   return path.startsWith("http") ? path : `${API_URL}${path}`;
+}
+
+export async function calculatePizzaOrder(
+  items: PizzaOrderedItem[],
+): Promise<CalculateOrderResponse> {
+  const response = await fetch(`${API_URL}/pizzas/calculate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ items }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    // Business errors come as `reason`, validation errors as `message` (string or string[])
+    const message = data.reason ?? [data.message].flat().join(", ");
+    throw new Error(message || "Failed to calculate order");
+  }
+
+  return data;
 }
 
 export function groupPizzasByCategory(

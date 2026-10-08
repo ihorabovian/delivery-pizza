@@ -3,17 +3,19 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, History, ShoppingBasket, User } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { History, User } from "lucide-react";
 import pizzaIcon from "@/app/icon.png";
 import avatarMascot from "@/public/avatar-mascot.png";
 import { PIZZA_CATEGORIES, PIZZA_CATEGORY_LABELS } from "@/lib/constants";
+import { AddressPicker } from "@/components/address-picker";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
-import { useCart } from "@/components/cart-context";
+import { CartSheet } from "@/components/cart-sheet";
 import type { PizzaCategory } from "@/types/pizza";
 
 export function SiteHeader() {
-  const { totalPrice } = useCart();
+  const pathname = usePathname();
+  const showCategories = pathname === "/";
   const headerRef = useRef<HTMLElement>(null);
   const [headerHeight, setHeaderHeight] = useState(140);
   const [activeCategory, setActiveCategory] = useState<PizzaCategory>(
@@ -95,13 +97,7 @@ export function SiteHeader() {
       {/* Mobile — compact address row + category chips */}
       <div className="sm:hidden">
         <div className="flex items-center justify-between gap-4">
-          <button
-            type="button"
-            className="flex cursor-pointer items-center gap-2 text-sm text-foreground hover:text-foreground/80"
-          >
-            Select delivery address
-            <ChevronDown className="size-4" />
-          </button>
+          <AddressPicker className="w-40" />
           <Image
             src={avatarMascot}
             alt=""
@@ -110,27 +106,29 @@ export function SiteHeader() {
           />
         </div>
 
-        <nav className="mt-6 flex gap-2 overflow-x-auto">
-          {PIZZA_CATEGORIES.map((category) => (
-            <Button
-              key={category}
-              variant={category === activeCategory ? "default" : "outline"}
-              className={
-                category === activeCategory
-                  ? "h-8 shrink-0 rounded-full border-transparent bg-black px-3 text-xs font-bold text-white hover:bg-black/80"
-                  : "h-8 shrink-0 rounded-full border-transparent bg-neutral-100 px-3 text-xs font-bold text-foreground hover:bg-neutral-200"
-              }
-              asChild
-            >
-              <a
-                href={`/#${category}`}
-                onClick={() => scrollToCategory(category)}
+        {showCategories && (
+          <nav className="mt-6 flex gap-2 overflow-x-auto">
+            {PIZZA_CATEGORIES.map((category) => (
+              <Button
+                key={category}
+                variant={category === activeCategory ? "default" : "outline"}
+                className={
+                  category === activeCategory
+                    ? "h-8 shrink-0 rounded-full border-transparent bg-black px-3 text-xs font-bold text-white hover:bg-black/80"
+                    : "h-8 shrink-0 rounded-full border-transparent bg-neutral-100 px-3 text-xs font-bold text-foreground hover:bg-neutral-200"
+                }
+                asChild
               >
-                {PIZZA_CATEGORY_LABELS[category]}
-              </a>
-            </Button>
-          ))}
-        </nav>
+                <a
+                  href={`/#${category}`}
+                  onClick={() => scrollToCategory(category)}
+                >
+                  {PIZZA_CATEGORY_LABELS[category]}
+                </a>
+              </Button>
+            ))}
+          </nav>
+        )}
       </div>
 
       {/* Tablet/desktop */}
@@ -146,27 +144,21 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-4">
-              <button
-                type="button"
-                className="flex cursor-pointer items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80"
-              >
-                Select delivery address
-                <ChevronDown className="size-4" />
-              </button>
-              <button
-                type="button"
+              <AddressPicker className="w-60" />
+              <Link
+                href="/orders"
                 aria-label="Order history"
                 className="flex size-6 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-foreground hover:bg-neutral-200"
               >
                 <History className="size-5" />
-              </button>
-              <button
-                type="button"
-                aria-label="Account"
+              </Link>
+              <Link
+                href="/profile"
+                aria-label="Profile"
                 className="flex size-6 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-foreground hover:bg-neutral-200"
               >
                 <User className="size-5" />
-              </button>
+              </Link>
             </div>
             <Button className="h-auto rounded-full bg-orange-50 px-5 py-2 text-base text-[#f14e1d] hover:bg-orange-100">
               Log in
@@ -174,34 +166,35 @@ export function SiteHeader() {
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-between gap-4">
-          <nav className="flex flex-wrap gap-2">
-            {PIZZA_CATEGORIES.map((category) => (
-              <Button
-                key={category}
-                variant={category === activeCategory ? "default" : "outline"}
-                className={
-                  category === activeCategory
-                    ? "h-12 rounded-full border-transparent bg-black px-6 text-base font-bold text-white hover:bg-black/80"
-                    : "h-12 rounded-full border-transparent bg-neutral-100 px-6 text-base font-bold text-foreground hover:bg-neutral-200"
-                }
-                asChild
-              >
-                <a
-                  href={`/#${category}`}
-                  onClick={() => scrollToCategory(category)}
+        {showCategories && (
+          <div className="mt-6 flex items-center justify-between gap-4">
+            <nav className="flex flex-wrap gap-2">
+              {PIZZA_CATEGORIES.map((category) => (
+                <Button
+                  key={category}
+                  variant={
+                    category === activeCategory ? "default" : "outline"
+                  }
+                  className={
+                    category === activeCategory
+                      ? "h-12 rounded-full border-transparent bg-black px-6 text-base font-bold text-white hover:bg-black/80"
+                      : "h-12 rounded-full border-transparent bg-neutral-100 px-6 text-base font-bold text-foreground hover:bg-neutral-200"
+                  }
+                  asChild
                 >
-                  {PIZZA_CATEGORY_LABELS[category]}
-                </a>
-              </Button>
-            ))}
-          </nav>
+                  <a
+                    href={`/#${category}`}
+                    onClick={() => scrollToCategory(category)}
+                  >
+                    {PIZZA_CATEGORY_LABELS[category]}
+                  </a>
+                </Button>
+              ))}
+            </nav>
 
-          <Button className="h-12 gap-2 rounded-full bg-[#f14e1d] px-7 text-base font-medium text-white hover:bg-[#f14e1d]/90">
-            <ShoppingBasket className="size-5" />
-            {formatPrice(totalPrice)}
-          </Button>
-        </div>
+            <CartSheet triggerClassName="h-12 px-7 text-base [&_svg]:size-5" />
+          </div>
+        )}
       </div>
     </header>
   );
