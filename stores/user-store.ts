@@ -11,6 +11,7 @@ export type UserProfile = {
 
 type UserState = UserProfile & {
   updateProfile: (profile: UserProfile) => void;
+  setPhone: (phone: string) => void;
   resetProfile: () => void;
 };
 
@@ -21,6 +22,7 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       ...EMPTY_PROFILE,
       updateProfile: (profile) => set(profile),
+      setPhone: (phone) => set({ phone }),
       resetProfile: () => set(EMPTY_PROFILE),
     }),
     {

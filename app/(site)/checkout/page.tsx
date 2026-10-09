@@ -13,8 +13,9 @@ import {
   useCartStore,
 } from "@/stores/cart-store";
 import { useHydrated } from "@/stores/use-hydrated";
+import { useUserStore } from "@/stores/user-store";
 import { Button } from "@/components/ui/button";
-import { calculatePizzaOrder } from "@/lib/api";
+import { calculatePizzaOrder, createPizzaPayment } from "@/lib/api";
 import { cn, formatDate, formatPrice } from "@/lib/utils";
 import jbPayMascot from "@/public/jb-pay-mascot.svg";
 import type { CalculateOrderResponse, CartItem } from "@/types/cart";
@@ -75,8 +76,12 @@ export default function CheckoutPage() {
   const { items } = useCartStore();
   const itemCount = useCartStore(selectItemCount);
   const totalPrice = useCartStore(selectTotalPrice);
-  const { address, setAddress } = useAddressStore();
-  const [phone, setPhone] = useState("");
+  const { address, street, house, setAddress } = useAddressStore();
+  // Phone lives in the persisted profile, so it survives leaving the checkout
+  const { phone, setPhone } = useUserStore();
+  const phoneDigits = phone.replace(/\D/g, "");
+  const [placing, setPlacing] = useState(false);
+  const [placeError, setPlaceError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "jbpay">("card");
   const [payWithoutSaving, setPayWithoutSaving] = useState(false);
   const [calculation, setCalculation] = useState<CalculateOrderResponse | null>(
@@ -111,10 +116,36 @@ export default function CheckoutPage() {
 
   const finalTotalPrice = calculation?.totalPrice ?? totalPrice;
 
-  const handlePlaceOrder = () => {
-    if (!address.trim()) return;
-    const orderNumber = String(Math.floor(1000 + Math.random() * 9000));
-    router.push(`/payment?amount=${finalTotalPrice}&order=${orderNumber}`);
+  const canPlaceOrder =
+    !!address.trim() &&
+    !!phoneDigits &&
+    !calculating &&
+    !calculateError &&
+    !placing;
+
+  const handlePlaceOrder = async () => {
+    if (!canPlaceOrder) return;
+    setPlacing(true);
+    setPlaceError(null);
+
+    try {
+      const order = await createPizzaPayment({
+        items: items.map(toOrderedItem),
+        person: { phone: phoneDigits },
+        receiverAddress: {
+          // Addresses saved before street/house were stored only have the full line
+          street: street || address,
+          house,
+          // TODO: API requires apartment, but the design has no field for it yet
+          apartment: "1",
+          comment: "",
+        },
+      });
+      router.push(`/payment?amount=${order.totalPrice}&order=${order._id}`);
+    } catch (error) {
+      setPlaceError((error as Error).message);
+      setPlacing(false);
+    }
   };
 
   // Wait for the persisted cart, otherwise "empty cart" flashes on reload
@@ -308,15 +339,17 @@ export default function CheckoutPage() {
 
           <div className="flex flex-col gap-4">
             <p className="text-lg text-foreground">Card for payment</p>
-            <Link
-              href={`/payment?amount=${finalTotalPrice}`}
-              className="flex w-33 cursor-pointer flex-col items-center gap-2 rounded-2xl bg-background p-2 py-4"
+            <button
+              type="button"
+              onClick={handlePlaceOrder}
+              disabled={!canPlaceOrder}
+              className="flex w-33 cursor-pointer flex-col items-center gap-2 rounded-2xl bg-background p-2 py-4 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="flex size-8 items-center justify-center rounded-full bg-muted">
                 <Plus className="size-4" />
               </span>
               <span className="text-sm text-foreground">New card</span>
-            </Link>
+            </button>
           </div>
 
           <button
@@ -348,11 +381,20 @@ export default function CheckoutPage() {
             <Button
               size="lg"
               className="h-13 w-full rounded-full bg-[#f14e1d] text-sm font-medium text-white hover:bg-[#f14e1d]/90"
-              disabled={!address.trim() || calculating || !!calculateError}
+              disabled={!canPlaceOrder}
               onClick={handlePlaceOrder}
             >
-              {address.trim() ? "Place order" : "Enter delivery address"}
+              {!address.trim()
+                ? "Enter delivery address"
+                : !phoneDigits
+                  ? "Enter phone"
+                  : "Place order"}
             </Button>
+            {placeError && (
+              <span className="text-center text-sm text-destructive">
+                {placeError}
+              </span>
+            )}
           </div>
         </aside>
       </div>
