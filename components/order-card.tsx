@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { cn, formatDate, formatPrice } from "@/lib/utils";
+import { cn, formatDate, formatOrderNumber, formatPrice } from "@/lib/utils";
 import type { Order } from "@/stores/order-store";
 
 export function OrderCard({
@@ -23,7 +23,7 @@ export function OrderCard({
     >
       <div className="flex flex-col">
         <span className="text-sm text-muted-foreground">
-          Order №{order.number}
+          Order №{formatOrderNumber(order.number)}
         </span>
         <span>{formatDate(new Date(order.createdAt))}</span>
       </div>

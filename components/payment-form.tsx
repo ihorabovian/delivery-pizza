@@ -5,9 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import pizzaIcon from "@/app/icon.png";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
+import { formatOrderNumber, formatPrice } from "@/lib/utils";
 import { Check } from "lucide-react";
 import { useAddressStore } from "@/stores/address-store";
+import { useAuthStore } from "@/stores/auth-store";
 import { useCardStore } from "@/stores/card-store";
 import { useCartStore } from "@/stores/cart-store";
 import { useOrderStore } from "@/stores/order-store";
@@ -46,7 +47,7 @@ export function PaymentForm({
     expiry.length === 5 &&
     cvv.length >= 3;
 
-  // Demo payment: no gateway yet, so "success" is simulated after a short delay
+  // The order is created on the backend at checkout; the card charge itself is still simulated
   const handlePay = () => {
     setPaying(true);
     setTimeout(() => {
@@ -58,7 +59,10 @@ export function PaymentForm({
         address: useAddressStore.getState().address,
         createdAt: new Date().toISOString(),
       });
-      useCardStore.getState().addCard(cardNumber.replace(/\s/g, "").slice(-4));
+      // Cards are saved to the account, so guests' cards are not kept
+      if (useAuthStore.getState().isAuthenticated) {
+        useCardStore.getState().addCard(cardNumber.replace(/\s/g, "").slice(-4));
+      }
       clearCart();
       setPaid(true);
     }, 1000);
@@ -91,7 +95,7 @@ export function PaymentForm({
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm text-muted-foreground">Order number</span>
-              <span className="text-base">{orderNumber}</span>
+              <span className="text-base">{formatOrderNumber(orderNumber)}</span>
             </div>
           </div>
         </div>
@@ -133,7 +137,7 @@ export function PaymentForm({
 
       <div className="mt-6 flex flex-col gap-1">
         <span className="text-sm text-muted-foreground">Order number</span>
-        <span className="text-2xl font-bold">{orderNumber}</span>
+        <span className="text-2xl font-bold">{formatOrderNumber(orderNumber)}</span>
       </div>
 
       <div className="mt-6 flex flex-col gap-4 rounded-3xl bg-muted/50 p-6">

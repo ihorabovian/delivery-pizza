@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatDate, formatPrice } from "@/lib/utils";
+import { formatDate, formatOrderNumber, formatPrice } from "@/lib/utils";
 import { useHydrated } from "@/stores/use-hydrated";
 import { useOrderStore } from "@/stores/order-store";
 
@@ -40,8 +40,8 @@ export function OrderStatus({ number }: { number: string }) {
         <span className="font-medium text-foreground">Order accepted</span>
       </nav>
 
-      <h1 className="mt-4 text-3xl font-bold tracking-tight">
-        Order №{order.number} is being prepared
+      <h1 className="mt-4 text-3xl font-bold tracking-tight break-all">
+        Order №{formatOrderNumber(order.number)} is being prepared
       </h1>
 
       <div className="mt-8 flex w-full max-w-82 flex-col gap-4">

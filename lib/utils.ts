@@ -18,3 +18,10 @@ export function formatDate(date: Date): string {
     day: "numeric",
   });
 }
+
+// The backend has no order number, only a Mongo _id; show its last 4 digits.
+// Display only: links and lookups keep the full _id.
+export function formatOrderNumber(id: string): string {
+  const digits = id.replace(/\D/g, "");
+  return digits.length >= 4 ? digits.slice(-4) : id.slice(-4).toUpperCase();
+}
