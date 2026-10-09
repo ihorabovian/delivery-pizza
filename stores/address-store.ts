@@ -2,16 +2,23 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { persistStorage } from "@/stores/storage";
 
-type AddressState = {
+export type SelectedAddress = {
   address: string;
-  setAddress: (address: string) => void;
+  street: string;
+  house: string;
+};
+
+type AddressState = SelectedAddress & {
+  setAddress: (selected: SelectedAddress) => void;
 };
 
 export const useAddressStore = create<AddressState>()(
   persist(
     (set) => ({
       address: "",
-      setAddress: (address) => set({ address }),
+      street: "",
+      house: "",
+      setAddress: (selected) => set(selected),
     }),
     {
       name: "address",

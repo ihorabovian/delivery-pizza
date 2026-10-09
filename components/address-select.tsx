@@ -3,10 +3,18 @@
 import { useMemo } from "react";
 import AsyncSelect from "react-select/async";
 import type { SingleValue } from "react-select";
+import type { SelectedAddress } from "@/stores/address-store";
 
 type AddressOption = {
   label: string;
   value: string;
+  address?: SelectedAddress;
+};
+
+type GeocodeResult = {
+  formatted: string;
+  street?: string;
+  housenumber?: string;
 };
 
 async function fetchAddressOptions(text: string): Promise<AddressOption[]> {
@@ -19,12 +27,15 @@ async function fetchAddressOptions(text: string): Promise<AddressOption[]> {
 
   const data = await response.json();
 
-  return (data.results ?? []).map(
-    (result: { formatted: string; place_id: string }) => ({
-      label: result.formatted,
-      value: result.formatted,
-    }),
-  );
+  return (data.results ?? []).map((result: GeocodeResult) => ({
+    label: result.formatted,
+    value: result.formatted,
+    address: {
+      address: result.formatted,
+      street: result.street ?? "",
+      house: result.housenumber ?? "",
+    },
+  }));
 }
 
 function debounce<Args extends unknown[], Result>(
@@ -45,7 +56,7 @@ export function AddressSelect({
   placeholder = "Select delivery address",
 }: {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (selected: SelectedAddress) => void;
   placeholder?: string;
 }) {
   const loadOptions = useMemo(() => debounce(fetchAddressOptions, 300), []);
@@ -60,7 +71,7 @@ export function AddressSelect({
       instanceId="address-select"
       value={selectedOption}
       onChange={(option: SingleValue<AddressOption>) =>
-        onChange(option?.value ?? "")
+        onChange(option?.address ?? { address: "", street: "", house: "" })
       }
       loadOptions={loadOptions}
       placeholder={placeholder}
