@@ -103,8 +103,8 @@ export function PaymentForm({
         <div className="flex flex-col gap-6">
           <Button
             asChild
-            size="lg"
-            className="h-13 w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
+            size="xl"
+            className="w-full bg-foreground text-background hover:bg-foreground/90"
           >
             <Link href={`/order/${orderNumber}`}>Back to site</Link>
           </Button>
@@ -195,8 +195,8 @@ export function PaymentForm({
       </div>
 
       <Button
-        size="lg"
-        className="mt-6 h-13 w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
+        size="xl"
+        className="mt-6 w-full bg-foreground text-background hover:bg-foreground/90"
         disabled={!isValid || paying}
         onClick={handlePay}
       >

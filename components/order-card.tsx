@@ -53,18 +53,19 @@ export function OrderCard({
 
       <div className="flex flex-col gap-2">
         <Button
+          variant="brand"
           asChild
-          size="lg"
-          className="h-13 w-full rounded-full bg-[#f14e1d] text-white hover:bg-[#f14e1d]/90"
+          size="xl"
+          className="w-full"
         >
           <Link href={`/order/${order.number}`}>Details</Link>
         </Button>
         {onCancel && (
           <Button
             variant="outline"
-            size="lg"
+            size="xl"
             onClick={onCancel}
-            className="h-13 w-full cursor-pointer rounded-full bg-transparent"
+            className="w-full bg-transparent"
           >
             Cancel order
           </Button>

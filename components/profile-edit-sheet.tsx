@@ -65,8 +65,8 @@ function ProfileForm({ onSaved }: { onSaved: () => void }) {
       <Button
         type="submit"
         variant="secondary"
-        size="lg"
-        className="mt-4 h-13 w-full cursor-pointer rounded-full"
+        size="xl"
+        className="mt-4 w-full"
       >
         Update details
       </Button>

@@ -92,7 +92,7 @@ export function SiteHeader() {
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-40 mx-auto w-full max-w-[1280px] bg-background px-4 py-4 sm:px-8 lg:px-10"
+      className="page-container sticky top-0 z-40 bg-background py-4"
     >
       {/* Mobile — compact address row + category chips */}
       <div className="sm:hidden">
@@ -160,7 +160,7 @@ export function SiteHeader() {
                 <User className="size-5" />
               </Link>
             </div>
-            <Button className="h-auto rounded-full bg-orange-50 px-5 py-2 text-base text-[#f14e1d] hover:bg-orange-100">
+            <Button className="h-auto rounded-full bg-orange-50 px-5 py-2 text-base text-brand hover:bg-orange-100">
               Log in
             </Button>
           </div>

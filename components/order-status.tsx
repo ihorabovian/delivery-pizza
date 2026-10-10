@@ -21,8 +21,9 @@ export function OrderStatus({ number }: { number: string }) {
       <main className="mx-auto flex w-full max-w-[1280px] flex-1 flex-col items-center justify-center gap-4 px-6 py-20 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Order not found</h1>
         <Button
+          variant="brand"
+          size="xl"
           asChild
-          className="h-13 rounded-full bg-[#f14e1d] px-6 text-white hover:bg-[#f14e1d]/90"
         >
           <Link href="/">View menu</Link>
         </Button>
@@ -31,7 +32,7 @@ export function OrderStatus({ number }: { number: string }) {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-6 sm:px-8 lg:px-10">
+    <main className="page-container flex-1 py-6">
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
         <span>Cart</span>
         <ChevronRight className="size-3.5" />
@@ -91,17 +92,18 @@ export function OrderStatus({ number }: { number: string }) {
 
         <div className="mt-6 flex flex-col gap-2">
           <Button
+            variant="brand"
             asChild
-            size="lg"
-            className="h-13 w-full rounded-full bg-[#f14e1d] text-white hover:bg-[#f14e1d]/90"
+            size="xl"
+            className="w-full"
           >
             <Link href="/">View menu</Link>
           </Button>
           <Button
             asChild
-            size="lg"
+            size="xl"
             variant="secondary"
-            className="h-13 w-full rounded-full"
+            className="w-full"
           >
             <Link href="/orders">Go to my orders</Link>
           </Button>

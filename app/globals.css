@@ -11,6 +11,8 @@ html {
 
 
 @theme inline {
+    /* Brand orange from the design; same in light and dark themes */
+    --color-brand: #f14e1d;
     --font-heading: var(--font-manrope);
     --font-sans: var(--font-manrope);
     --color-sidebar-ring: var(--sidebar-ring);
@@ -132,4 +134,8 @@ html {
   html {
     @apply font-sans;
     }
+}
+/* Centered page column shared by the header and every page */
+@utility page-container {
+  @apply mx-auto w-full max-w-[1280px] px-4 sm:px-8 lg:px-10;
 }

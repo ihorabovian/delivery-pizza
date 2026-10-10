@@ -16,7 +16,7 @@ function getBadgeLabel(pizza: Pizza): string | null {
 
 function PizzaBadge({ label }: { label: string }) {
   return (
-    <span className="absolute left-2 top-2 z-10 inline-flex h-6 items-center justify-center rounded-full bg-[#f14e1d] px-3 text-[10px] font-bold tracking-wide text-white lg:h-auto lg:px-4 lg:py-2 lg:text-xs">
+    <span className="absolute left-2 top-2 z-10 inline-flex h-6 items-center justify-center rounded-full bg-brand px-3 text-[10px] font-bold tracking-wide text-white lg:h-auto lg:px-4 lg:py-2 lg:text-xs">
       {label}
     </span>
   );

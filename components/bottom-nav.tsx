@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 
 const itemClassName = (active: boolean) =>
   active
-    ? "flex flex-1 flex-col items-center gap-0.5 rounded-full bg-orange-50 py-2 text-[#f14e1d]"
+    ? "flex flex-1 flex-col items-center gap-0.5 rounded-full bg-orange-50 py-2 text-brand"
     : "flex flex-1 flex-col items-center gap-0.5 rounded-full py-2 text-neutral-400";
 
 export function BottomNav() {

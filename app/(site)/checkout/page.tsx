@@ -32,8 +32,6 @@ function toOrderedItem(item: CartItem) {
   };
 }
 
-const ORDER_DATE = formatDate(new Date());
-
 function Breadcrumb({ step }: { step: "checkout" | "placed" }) {
   const steps = [
     { key: "cart", label: "Cart" },
@@ -80,6 +78,8 @@ export default function CheckoutPage() {
   // Phone lives in the persisted profile, so it survives leaving the checkout
   const { phone, setPhone } = useUserStore();
   const phoneDigits = phone.replace(/\D/g, "");
+  // Taken once per visit, not at module load, so it stays current between visits
+  const [orderDate] = useState(() => formatDate(new Date()));
   const [placing, setPlacing] = useState(false);
   const [placeError, setPlaceError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "jbpay">("card");
@@ -161,8 +161,9 @@ export default function CheckoutPage() {
           Add something from the menu before checking out.
         </p>
         <Button
+          variant="brand"
+          size="xl"
           asChild
-          className="h-13 rounded-full bg-[#f14e1d] px-6 text-white hover:bg-[#f14e1d]/90"
         >
           <Link href="/">Back to menu</Link>
         </Button>
@@ -171,7 +172,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-6 sm:px-8 lg:px-10">
+    <main className="page-container flex-1 py-6">
       <Breadcrumb step="checkout" />
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">Order details</h1>
@@ -233,7 +234,7 @@ export default function CheckoutPage() {
               <span className="text-base font-medium text-muted-foreground">
                 Order date
               </span>
-              <span className="text-base font-medium">{ORDER_DATE}</span>
+              <span className="text-base font-medium">{orderDate}</span>
             </div>
 
             <div className="flex flex-col gap-1">
@@ -379,8 +380,9 @@ export default function CheckoutPage() {
               We&apos;ll deliver for free
             </span>
             <Button
-              size="lg"
-              className="h-13 w-full rounded-full bg-[#f14e1d] text-sm font-medium text-white hover:bg-[#f14e1d]/90"
+              variant="brand"
+              size="xl"
+              className="w-full"
               disabled={!canPlaceOrder}
               onClick={handlePlaceOrder}
             >

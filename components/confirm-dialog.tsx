@@ -30,7 +30,7 @@ export function ConfirmDialog({
       >
         <span
           aria-hidden
-          className="flex size-12 items-center justify-center rounded-full bg-[#f14e1d] text-2xl font-bold text-white"
+          className="flex size-12 items-center justify-center rounded-full bg-brand text-2xl font-bold text-white"
         >
           ?
         </span>
@@ -43,19 +43,20 @@ export function ConfirmDialog({
           <DialogClose asChild>
             <Button
               variant="secondary"
-              size="lg"
-              className="h-13 w-full cursor-pointer rounded-full"
+              size="xl"
+              className="w-full"
             >
               Cancel
             </Button>
           </DialogClose>
           <Button
-            size="lg"
+            variant="brand"
+            size="xl"
             onClick={() => {
               onConfirm();
               onOpenChange(false);
             }}
-            className="h-13 w-full cursor-pointer rounded-full bg-[#f14e1d] text-white hover:bg-[#f14e1d]/90"
+            className="w-full"
           >
             {confirmLabel}
           </Button>

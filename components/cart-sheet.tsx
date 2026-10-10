@@ -39,7 +39,7 @@ export function CartSheet({ triggerClassName }: { triggerClassName?: string }) {
         <button
           type="button"
           className={cn(
-            "flex h-10 items-center gap-2 rounded-full bg-[#f14e1d] px-5 text-sm font-medium text-white hover:bg-[#f14e1d]/90",
+            "flex h-10 items-center gap-2 rounded-full bg-brand px-5 text-sm font-medium text-white hover:bg-brand/90",
             triggerClassName,
           )}
         >
@@ -108,7 +108,7 @@ export function CartSheet({ triggerClassName }: { triggerClassName?: string }) {
                     </span>
 
                     <div className="flex items-center gap-4">
-                      <span className="text-sm font-medium text-[#f14e1d]">
+                      <span className="text-sm font-medium text-brand">
                         Edit
                       </span>
                       <div className="flex items-center gap-2 rounded-full bg-muted px-1 py-1">
@@ -213,9 +213,10 @@ export function CartSheet({ triggerClassName }: { triggerClassName?: string }) {
             </div>
             <SheetClose asChild>
               <Button
+                variant="brand"
                 asChild
-                size="lg"
-                className="h-13 w-full rounded-full bg-[#f14e1d] text-sm font-medium text-white hover:bg-[#f14e1d]/90"
+                size="xl"
+                className="w-full"
               >
                 <Link href="/checkout">Proceed to checkout</Link>
               </Button>

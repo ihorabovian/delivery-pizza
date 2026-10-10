@@ -8,7 +8,7 @@ export default async function Home() {
   const groups = groupPizzasByCategory(pizzas);
 
   return (
-    <div className="mx-auto w-full max-w-[1280px] px-4 py-10 sm:px-8 lg:px-10 lg:pb-25.5">
+    <div className="page-container py-10 lg:pb-25.5">
       {PIZZA_CATEGORIES.map((category) => {
         const items = groups[category];
 

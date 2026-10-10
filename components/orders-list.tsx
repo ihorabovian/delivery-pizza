@@ -40,7 +40,7 @@ export function OrdersList() {
   if (!hydrated) return null;
 
   return (
-    <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-10 sm:px-8 lg:px-10">
+    <main className="page-container flex-1 py-10">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">My orders</h1>
 
@@ -84,15 +84,16 @@ export function OrdersList() {
 
       {visibleOrders.length === 0 ? (
         <div className="mt-6 flex w-full max-w-211 flex-col items-center gap-2 rounded-3xl bg-muted px-6 py-8">
-          <Pizza className="size-8 text-[#f14e1d]" />
+          <Pizza className="size-8 text-brand" />
           <p className="text-xl">Nothing here yet</p>
           <p className="text-sm text-muted-foreground">
             Make a purchase and it will show up here
           </p>
           <Button
+            variant="brand"
             asChild
-            size="lg"
-            className="mt-4 h-13 w-full rounded-full bg-[#f14e1d] text-white hover:bg-[#f14e1d]/90"
+            size="xl"
+            className="mt-4 w-full"
           >
             <Link href="/">Go to home</Link>
           </Button>

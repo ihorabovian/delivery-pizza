@@ -43,8 +43,10 @@ export default function Error({
       </div>
 
       <Button
+        variant="brand"
+        size="xl"
         asChild
-        className="h-13 w-full rounded-full bg-[#f14e1d] text-sm font-medium text-white hover:bg-[#f14e1d]/90 lg:w-88.5"
+        className="w-full lg:w-88.5"
       >
         <Link href="/">View menu</Link>
       </Button>
