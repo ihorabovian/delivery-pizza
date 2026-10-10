@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { formatOrderNumber, formatPrice } from "@/lib/utils";
 import { Check } from "lucide-react";
 import { useAddressStore } from "@/stores/address-store";
-import { useAuthStore } from "@/stores/auth-store";
+import { selectIsAuthenticated, useAuthStore } from "@/stores/auth-store";
 import { useCardStore } from "@/stores/card-store";
 import { useCartStore } from "@/stores/cart-store";
 import { useOrderStore } from "@/stores/order-store";
@@ -60,7 +60,7 @@ export function PaymentForm({
         createdAt: new Date().toISOString(),
       });
       // Cards are saved to the account, so guests' cards are not kept
-      if (useAuthStore.getState().isAuthenticated) {
+      if (selectIsAuthenticated(useAuthStore.getState())) {
         useCardStore.getState().addCard(cardNumber.replace(/\s/g, "").slice(-4));
       }
       clearCart();

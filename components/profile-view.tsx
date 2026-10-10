@@ -3,15 +3,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { CreditCard, Pizza, type LucideIcon } from "lucide-react";
 import avatarMascot from "@/public/avatar-mascot.png";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { LogoutButton } from "@/components/logout-button";
 import { OrderCard } from "@/components/order-card";
 import { ProfileEditSheet } from "@/components/profile-edit-sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/stores/auth-store";
+import { selectIsAuthenticated, useAuthStore } from "@/stores/auth-store";
 import { useCardStore } from "@/stores/card-store";
 import { useOrderStore } from "@/stores/order-store";
 import { useHydrated } from "@/stores/use-hydrated";
@@ -71,7 +71,7 @@ function OrdersTab() {
 }
 
 function CardsTab() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const cards = useCardStore((state) => state.cards);
   const removeCard = useCardStore((state) => state.removeCard);
   const [cardToDelete, setCardToDelete] = useState<string | null>(null);
@@ -128,24 +128,19 @@ function CardsTab() {
 }
 
 export function ProfileView() {
-  const router = useRouter();
   // Every store shown here is restored from localStorage after mount
   const userHydrated = useHydrated(useUserStore.persist);
   const ordersHydrated = useHydrated(useOrderStore.persist);
   const cardsHydrated = useHydrated(useCardStore.persist);
-  const { name, email, phone, resetProfile } = useUserStore();
-  const { isAuthenticated, signOut } = useAuthStore();
+  const authHydrated = useHydrated(useAuthStore.persist);
+  const { name, email, phone } = useUserStore();
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const [tab, setTab] = useState<TabKey>("orders");
   const [editOpen, setEditOpen] = useState(false);
-  const [logoutOpen, setLogoutOpen] = useState(false);
 
-  if (!userHydrated || !ordersHydrated || !cardsHydrated) return null;
-
-  const handleLogout = () => {
-    signOut();
-    resetProfile();
-    router.push("/");
-  };
+  if (!userHydrated || !ordersHydrated || !cardsHydrated || !authHydrated) {
+    return null;
+  }
 
   return (
     <main className="page-container flex-1 py-10">
@@ -207,15 +202,13 @@ export function ProfileView() {
             >
               Edit profile
             </Button>
-            <Button
-              variant="brand"
-              size="xl"
-              disabled={!isAuthenticated}
-              onClick={() => setLogoutOpen(true)}
-              className="w-full"
-            >
-              Log out
-            </Button>
+            {isAuthenticated ? (
+              <LogoutButton variant="brand" size="xl" className="w-full" />
+            ) : (
+              <Button asChild variant="brand" size="xl" className="w-full">
+                <Link href="/sign-in?redirect=/profile">Sign in</Link>
+              </Button>
+            )}
           </div>
         </section>
 
@@ -223,13 +216,6 @@ export function ProfileView() {
       </div>
 
       <ProfileEditSheet open={editOpen} onOpenChange={setEditOpen} />
-      <ConfirmDialog
-        open={logoutOpen}
-        onOpenChange={setLogoutOpen}
-        title="Are you sure you want to log out of your profile?"
-        confirmLabel="Log out"
-        onConfirm={handleLogout}
-      />
     </main>
   );
 }
