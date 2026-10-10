@@ -11,6 +11,7 @@ import { OrderCard } from "@/components/order-card";
 import { ProfileEditSheet } from "@/components/profile-edit-sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/auth-store";
 import { useCardStore } from "@/stores/card-store";
 import { useOrderStore } from "@/stores/order-store";
 import { useHydrated } from "@/stores/use-hydrated";
@@ -23,9 +24,6 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
-const PRIMARY_BUTTON =
-  "h-13 w-full cursor-pointer rounded-full bg-[#f14e1d] text-white hover:bg-[#f14e1d]/90";
-
 function EmptyState({
   icon: Icon,
   title,
@@ -37,11 +35,11 @@ function EmptyState({
 }) {
   return (
     <div className="flex w-full flex-col items-center gap-2 rounded-3xl bg-muted p-6 text-center">
-      <Icon className="size-10 text-[#f14e1d]" />
+      <Icon className="size-10 text-brand" />
       <p className="mt-2 text-2xl">{title}</p>
       <p className="text-muted-foreground">{text}</p>
 
-      <Button asChild size="lg" className={cn("mt-4", PRIMARY_BUTTON)}>
+      <Button asChild variant="brand" size="xl" className="mt-4 w-full">
         <Link href="/">View menu</Link>
       </Button>
     </div>
@@ -73,6 +71,7 @@ function OrdersTab() {
 }
 
 function CardsTab() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const cards = useCardStore((state) => state.cards);
   const removeCard = useCardStore((state) => state.removeCard);
   const [cardToDelete, setCardToDelete] = useState<string | null>(null);
@@ -81,7 +80,13 @@ function CardsTab() {
     <section className="flex w-full flex-col gap-4">
       <h2 className="text-2xl font-bold">My cards</h2>
 
-      {cards.length === 0 ? (
+      {!isAuthenticated ? (
+        <EmptyState
+          icon={CreditCard}
+          title="Sign in to use saved cards"
+          text="Saved cards are available only in your account"
+        />
+      ) : cards.length === 0 ? (
         <EmptyState
           icon={CreditCard}
           title="No saved cards"
@@ -91,7 +96,7 @@ function CardsTab() {
         <ul className="flex flex-wrap gap-4">
           {cards.map((card) => (
             <li key={card.id} className="flex w-32.5 flex-col gap-2">
-              <div className="relative h-18 rounded-xl bg-linear-to-tr from-[#f9b49c] to-[#f14e1d] p-2">
+              <div className="relative h-18 rounded-xl bg-linear-to-tr from-[#f9b49c] to-brand p-2">
                 <span className="rounded-full bg-black px-2 py-0.5 text-xs font-extrabold text-white">
                   jB
                 </span>
@@ -129,20 +134,21 @@ export function ProfileView() {
   const ordersHydrated = useHydrated(useOrderStore.persist);
   const cardsHydrated = useHydrated(useCardStore.persist);
   const { name, email, phone, resetProfile } = useUserStore();
+  const { isAuthenticated, signOut } = useAuthStore();
   const [tab, setTab] = useState<TabKey>("orders");
   const [editOpen, setEditOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   if (!userHydrated || !ordersHydrated || !cardsHydrated) return null;
 
-  // No sign-in on this level: "log out" just clears the locally saved profile
   const handleLogout = () => {
+    signOut();
     resetProfile();
     router.push("/");
   };
 
   return (
-    <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-10 sm:px-8 lg:px-10">
+    <main className="page-container flex-1 py-10">
       <div className="flex justify-end">
         <div className="flex rounded-full bg-muted p-1">
           {TABS.map(({ key, label }) => (
@@ -194,16 +200,19 @@ export function ProfileView() {
           <div className="mt-4 flex flex-col gap-3">
             <Button
               variant="secondary"
-              size="lg"
+              size="xl"
+              disabled={!isAuthenticated}
               onClick={() => setEditOpen(true)}
-              className="h-13 w-full cursor-pointer rounded-full"
+              className="w-full"
             >
               Edit profile
             </Button>
             <Button
-              size="lg"
+              variant="brand"
+              size="xl"
+              disabled={!isAuthenticated}
               onClick={() => setLogoutOpen(true)}
-              className={PRIMARY_BUTTON}
+              className="w-full"
             >
               Log out
             </Button>
