@@ -11,11 +11,19 @@ import { PIZZA_CATEGORIES, PIZZA_CATEGORY_LABELS } from "@/lib/constants";
 import { AddressPicker } from "@/components/address-picker";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "@/components/cart-sheet";
+import { LogoutButton } from "@/components/logout-button";
+import { selectIsAuthenticated, useAuthStore } from "@/stores/auth-store";
+import { useHydrated } from "@/stores/use-hydrated";
 import type { PizzaCategory } from "@/types/pizza";
+
+const AUTH_BUTTON =
+  "h-auto rounded-full bg-orange-50 px-5 py-2 text-base text-brand hover:bg-orange-100";
 
 export function SiteHeader() {
   const pathname = usePathname();
   const showCategories = pathname === "/";
+  const authHydrated = useHydrated(useAuthStore.persist);
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const headerRef = useRef<HTMLElement>(null);
   const [headerHeight, setHeaderHeight] = useState(140);
   const [activeCategory, setActiveCategory] = useState<PizzaCategory>(
@@ -160,9 +168,15 @@ export function SiteHeader() {
                 <User className="size-5" />
               </Link>
             </div>
-            <Button className="h-auto rounded-full bg-orange-50 px-5 py-2 text-base text-brand hover:bg-orange-100">
-              Log in
-            </Button>
+            {/* Rendered once the session is restored, so the wrong label doesn't flash */}
+            {authHydrated &&
+              (isAuthenticated ? (
+                <LogoutButton className={AUTH_BUTTON} />
+              ) : (
+                <Button asChild className={AUTH_BUTTON}>
+                  <Link href={`/sign-in?redirect=${pathname}`}>Log in</Link>
+                </Button>
+              ))}
           </div>
         </div>
 
