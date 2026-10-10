@@ -14,8 +14,8 @@ Pizza delivery storefront (catalog browsing, currently no checkout/ordering flow
 
 - `app/page.tsx` — server component. Fetches the pizza catalog and renders it grouped by category (pizza, breakfast, wings, milkshake).
 - `app/layout.tsx` — root layout (fonts, `CatalogProvider`).
-- `lib/api.ts` — data layer. `fetchPizzaCatalog()` hits `${NEXT_PUBLIC_API_URL}/pizzas/catalog` (revalidate: 60s), returns `Pizza[]`. Also has `getStartingPrice`, `getPizzaImageUrl`, `groupPizzasByCategory`.
-- `lib/constants.ts` — `PIZZA_CATEGORIES` order + `PIZZA_CATEGORY_LABELS`.
+- `lib/api.ts` — data layer. `fetchPizzaCatalog()` hits `${NEXT_PUBLIC_API_URL}/pizzas/catalog` (revalidate: 60s), returns `Pizza[]`. Also has `getStartingPrice`, `getPizzaImageUrl`, `groupPizzasByCategory`, and auth calls `requestOtp`, `signIn`, `signOut` (sent as `x-application: mobile`, so the session token comes back in the body and goes out as `Authorization: Bearer`; the web cookie flow can't work because the API's CORS is `origin: *`).
+- `lib/constants.ts` — shared domain constants: `PIZZA_CATEGORIES` order, `PIZZA_CATEGORY_LABELS`, `PIZZA_SIZE_LABELS`. Constants used by a single component stay in that component.
 - `lib/utils.ts` — `cn` (re-exported from `cn` package, not the usual clsx+tailwind-merge local helper), `formatPrice` (CAD currency formatting, e.g. `CA$25`).
 - `types/pizza.ts` — `Pizza`, `PizzaSize`, `PizzaOption`, `PizzaIngredient`, `PizzaCategory` types. This is the source of truth for catalog shape.
 - `types/cart.ts` — currently empty, cart types not yet defined.
@@ -24,6 +24,8 @@ Pizza delivery storefront (catalog browsing, currently no checkout/ordering flow
 - `stores/order-store.ts` — Zustand `useOrderStore` (orders, addOrder, cancelOrder) + `isActiveOrder`. Orders are saved on successful (demo) payment.
 - `stores/user-store.ts` — Zustand `useUserStore` (name, phone, email, updateProfile, resetProfile). Local profile on this level (no sign-in yet; backend `/api/users/profile` needs auth).
 - `stores/card-store.ts` — Zustand `useCardStore` (cards, addCard, removeCard). Only the last 4 digits are saved, on successful payment.
+- `stores/auth-store.ts` — Zustand `useAuthStore` (token, user, setSession, signOut) + `selectIsAuthenticated`. Persisted; gates Edit profile, Log out and saved cards.
+- `app/(standalone)/` — pages without the site header/footer, sharing one root layout: `payment`, `sign-in` (`components/sign-in-form.tsx`: phone → OTP code; codes are listed at `${NEXT_PUBLIC_API_URL}/otps`). `/sign-in?redirect=/path` returns there after sign-in.
 - `app/(site)/profile` + `components/profile-view.tsx` — profile page: orders/cards tabs, `profile-edit-sheet.tsx`, `confirm-dialog.tsx` (logout, delete card).
 - Cart, address, orders, user and cards persist to `localStorage` via `persist` with `skipHydration` and the shared `persistStorage` (`stores/storage.ts`); `components/store-rehydrate.tsx` restores them after mount. Use `useHydrated(store.persist)` (`stores/use-hydrated.ts`) before rendering persisted data.
 - `components/catalog-context.tsx` — `CatalogProvider`/`useCatalog`: passes the server-fetched catalog to client components. Server data, not client state, so it stays a context.
@@ -34,6 +36,7 @@ Pizza delivery storefront (catalog browsing, currently no checkout/ordering flow
 ## Conventions
 
 - Env var `NEXT_PUBLIC_API_URL` points to the backend serving `/pizzas/catalog`; image paths from the API may be relative and must go through `getPizzaImageUrl`.
+- Styling: brand orange is the `brand` theme color (`bg-brand`, `text-brand`), never a raw hex. Large pill buttons are `<Button variant="brand" size="xl">` (or `size="xl"` with another variant). Page width/gutters come from the `page-container` utility in `app/globals.css`.
 - Prices are always in cents-free integers (whole CAD dollars) — `formatPrice` has no decimals.
 - Server components fetch data (`app/page.tsx`); client components (`"use client"`) hold interaction state (cart, dialogs).
 
