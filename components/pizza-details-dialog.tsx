@@ -6,6 +6,7 @@ import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import type { Pizza, PizzaSize } from "@/types/pizza";
 import { getPizzaImageUrl } from "@/lib/api";
+import { PIZZA_SIZE_LABELS } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cart-store";
@@ -16,12 +17,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-
-const SIZE_LABELS: Record<PizzaSize["type"], string> = {
-  small: "Small",
-  medium: "Medium",
-  large: "Large",
-};
 
 function formatLabel(slug: string): string {
   return slug
@@ -126,7 +121,7 @@ export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
                 value={item.type}
                 className="flex-1 rounded-full px-5 py-1.5 text-sm font-medium text-muted-foreground data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm transition-all sm:flex-none"
               >
-                {SIZE_LABELS[item.type]}
+                {PIZZA_SIZE_LABELS[item.type]}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
