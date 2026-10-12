@@ -8,70 +8,69 @@ export default async function Home() {
   const groups = groupPizzasByCategory(pizzas);
 
   return (
-    <div className="page-container py-10 lg:pb-25.5">
-      {PIZZA_CATEGORIES.map((category) => {
-        const items = groups[category];
+    <div className="page-container py-10 lg:flex lg:items-start lg:gap-8 lg:pb-25.5">
+      <div className="min-w-0 lg:w-[832px] lg:shrink-0">
+        {PIZZA_CATEGORIES.map((category) => {
+          const items = groups[category];
 
-        if (items.length === 0) {
-          return null;
-        }
+          if (items.length === 0) {
+            return null;
+          }
 
-        const isPizza = category === "pizza";
+          const isPizza = category === "pizza";
 
-        return (
-          <section
-            key={category}
-            id={category}
-            className="mb-16 scroll-mt-[var(--header-height)] lg:mb-12"
-          >
-            <h2 className="mb-6 hidden text-2xl font-semibold sm:block">
-              {PIZZA_CATEGORY_LABELS[category]}
-            </h2>
-            {isPizza ? (
-              <>
-                {/* Mobile/tablet: one continuous grid so odd-numbered rows
+          return (
+            <section
+              key={category}
+              id={category}
+              className="mb-16 scroll-mt-[var(--header-height)] lg:mb-12"
+            >
+              <h2 className="mb-6 hidden text-2xl font-semibold sm:block">
+                {PIZZA_CATEGORY_LABELS[category]}
+              </h2>
+              {isPizza ? (
+                <>
+                  {/* Mobile/tablet: one continuous grid so odd-numbered rows
                     never strand a lone card (the banner stays lg-only). */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:hidden">
-                  {items.map((pizza, index) => (
-                    <PizzaCard
-                      key={pizza._id}
-                      pizza={pizza}
-                      featured={index === 0}
-                    />
-                  ))}
-                </div>
-
-                {/* Desktop: promo row (featured + 3 cards + banner, uncapped
-                    so all 5 fit on one line) then a max-w-[832px] grid below
-                    that fits exactly 4 regular cards per row. */}
-                <div className="hidden lg:flex lg:flex-wrap lg:items-start lg:gap-8">
-                  {items.slice(0, 4).map((pizza, index) => (
-                    <PizzaCard
-                      key={pizza._id}
-                      pizza={pizza}
-                      featured={index === 0}
-                    />
-                  ))}
-                  <PizzaBanner />
-                </div>
-                {items.length > 4 && (
-                  <div className="hidden lg:mt-8 lg:flex lg:max-w-[832px] lg:flex-wrap lg:gap-8">
-                    {items.slice(4).map((pizza) => (
-                      <PizzaCard key={pizza._id} pizza={pizza} />
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:hidden">
+                    {items.map((pizza, index) => (
+                      <PizzaCard
+                        key={pizza._id}
+                        pizza={pizza}
+                        featured={index === 0}
+                      />
                     ))}
                   </div>
-                )}
-              </>
-            ) : (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:flex lg:max-w-[832px] lg:flex-wrap lg:gap-8">
-                {items.map((pizza) => (
-                  <PizzaCard key={pizza._id} pizza={pizza} />
-                ))}
-              </div>
-            )}
-          </section>
-        );
-      })}
+
+                  {/* Desktop: 4 cards per row; the banner lives in its own
+                    sticky column next to the catalog. */}
+                  <div className="hidden lg:flex lg:flex-wrap lg:gap-8">
+                    {items.map((pizza, index) => (
+                      <PizzaCard
+                        key={pizza._id}
+                        pizza={pizza}
+                        featured={index === 0}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:flex lg:max-w-[832px] lg:flex-wrap lg:gap-8">
+                  {items.map((pizza) => (
+                    <PizzaCard key={pizza._id} pizza={pizza} />
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        })}
+      </div>
+
+      {/* Sticks under the header while the catalog scrolls. Top margin lines
+          it up with the first row of cards, below the section heading. */}
+      <aside className="hidden lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:mt-14 lg:block">
+        <PizzaBanner />
+      </aside>
     </div>
   );
 }
