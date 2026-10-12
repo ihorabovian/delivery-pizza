@@ -58,12 +58,12 @@ Pizza delivery storefront: catalog, cart, checkout with orders created on the ba
 - `types/auth.ts` — `AuthUser`, `SignInResponse`.
 - `stores/cart-store.ts` — Zustand `useCartStore` (items, addItem, removeItem, updateQuantity, clearCart) + `selectItemCount`/`selectTotalPrice`.
 - `stores/address-store.ts` — Zustand `useAddressStore` (address, setAddress).
-- `stores/order-store.ts` — Zustand `useOrderStore` (orders, addOrder, cancelOrder) + `isActiveOrder`. Orders are saved on successful (demo) payment.
-- `stores/card-store.ts` — Zustand `useCardStore` (cards, addCard, removeCard). Only the last 4 digits are saved, on successful payment.
+- `stores/order-store.ts` — Zustand `useOrderStore` (orders, addOrder, cancelOrder) + `isActiveOrder`. Guests only: orders are saved locally after payment. Signed-in users get orders from the backend via `useOrders` (`stores/use-orders.ts`, mapped by `lib/orders.ts`). The backend links orders to a user by phone and lists only paid ones, so checkout uses the profile phone and the payment page calls `payTransaction` (`POST /transactions/pay`).
+- Saved cards come from the backend (`fetchCards`/`deleteCard`, `GET`/`DELETE /cards/cards`); a card is saved by the backend itself when an order is paid with `saveCard`.
 - `stores/auth-store.ts` — Zustand `useAuthStore` (token, user, setSession, setUser, signOut) + `selectIsAuthenticated`. Persisted; `user` is the backend profile (`fetchProfile`/`updateProfile` in `lib/api.ts`, refreshed on the profile page). Gates Edit profile, Log out and saved cards.
 - `app/(standalone)/` — pages without the site header/footer, sharing one root layout: `payment`, `sign-in` (`components/sign-in-form.tsx`: phone → OTP code; codes are listed at `${NEXT_PUBLIC_API_URL}/otps`). `/sign-in?redirect=/path` returns there after sign-in.
 - `app/(site)/profile` + `components/profile-view.tsx` — profile page: orders/cards tabs, `profile-edit-sheet.tsx`, `confirm-dialog.tsx` (logout, delete card).
-- Cart, address, orders and cards persist to `localStorage` via `persist` with `skipHydration` and the shared `persistStorage` (`stores/storage.ts`); `components/store-rehydrate.tsx` restores them after mount. Use `useHydrated(store.persist)` (`stores/use-hydrated.ts`) before rendering persisted data.
+- Cart, address and guest orders persist to `localStorage` via `persist` with `skipHydration` and the shared `persistStorage` (`stores/storage.ts`); `components/store-rehydrate.tsx` restores them after mount. Use `useHydrated(store.persist)` (`stores/use-hydrated.ts`) before rendering persisted data.
 - `components/catalog-context.tsx` — `CatalogProvider`/`useCatalog`: passes the server-fetched catalog to client components. Server data, not client state, so it stays a context.
 - `components/pizza-card.tsx`, `components/pizza-details-dialog.tsx` — catalog card + detail dialog.
 - `components/header.tsx`, `components/footer.tsx` — layout chrome.
@@ -71,6 +71,7 @@ Pizza delivery storefront: catalog, cart, checkout with orders created on the ba
 
 ## Conventions
 
+- Authorized client requests (profile, orders, cards) go through the same-origin `/backend/*` rewrite in `next.config.ts`: the API's CORS allows only GET/HEAD/POST, so PATCH/DELETE straight to the API fail with "Failed to fetch".
 - Env var `NEXT_PUBLIC_API_URL` points to the backend serving `/pizzas/catalog`; image paths from the API may be relative and must go through `getPizzaImageUrl`.
 - Styling: brand orange is the `brand` theme color (`bg-brand`, `text-brand`), never a raw hex. Large pill buttons are `<Button variant="brand" size="xl">` (or `size="xl"` with another variant). Page width/gutters come from the `page-container` utility in `app/globals.css`.
 - Prices are always in cents-free integers (whole CAD dollars) — `formatPrice` has no decimals.

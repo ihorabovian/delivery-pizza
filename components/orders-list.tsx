@@ -6,8 +6,8 @@ import { ChevronLeft, ChevronRight, Pizza } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { OrderCard } from "@/components/order-card";
-import { useHydrated } from "@/stores/use-hydrated";
-import { isActiveOrder, useOrderStore } from "@/stores/order-store";
+import { isActiveOrder } from "@/stores/order-store";
+import { useOrders } from "@/stores/use-orders";
 
 const TABS = [
   { key: "active", label: "Active" },
@@ -20,9 +20,7 @@ type TabKey = (typeof TABS)[number]["key"];
 const SCROLL_STEP = 520;
 
 export function OrdersList() {
-  const hydrated = useHydrated(useOrderStore.persist);
-  const orders = useOrderStore((state) => state.orders);
-  const cancelOrder = useOrderStore((state) => state.cancelOrder);
+  const { orders, ready, cancelOrder } = useOrders();
   const [tab, setTab] = useState<TabKey>("active");
   const scrollerRef = useRef<HTMLDivElement>(null);
 
@@ -37,7 +35,7 @@ export function OrdersList() {
     });
   };
 
-  if (!hydrated) return null;
+  if (!ready) return null;
 
   return (
     <main className="page-container flex-1 py-10">
@@ -108,7 +106,7 @@ export function OrdersList() {
               key={order.number}
               order={order}
               onCancel={
-                isActiveOrder(order)
+                isActiveOrder(order) && order.cancellable !== false
                   ? () => cancelOrder(order.number)
                   : undefined
               }
