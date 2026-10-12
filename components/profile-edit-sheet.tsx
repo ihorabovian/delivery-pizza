@@ -14,27 +14,23 @@ import { updateProfile } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth-store";
 import type { UpdateProfileRequest } from "@/types/auth";
 
+// "Name" is the backend's firstname. The phone is the sign-in identifier
+// and the API can't change it, so it's shown read-only.
 const FIELDS = [
   {
     name: "firstname",
-    label: "First name",
+    label: "Name",
     type: "text",
     autoComplete: "given-name",
   },
   {
-    name: "middlename",
-    label: "Middle name",
-    type: "text",
-    autoComplete: "additional-name",
-  },
-  {
-    name: "lastname",
-    label: "Last name",
-    type: "text",
-    autoComplete: "family-name",
+    name: "phone",
+    label: "Phone",
+    type: "tel",
+    autoComplete: "tel",
+    readOnly: true,
   },
   { name: "email", label: "Email", type: "email", autoComplete: "email" },
-  { name: "city", label: "City", type: "text", autoComplete: "address-level2" },
 ] as const;
 
 const inputClassName =
@@ -55,9 +51,10 @@ function ProfileForm({ onSaved }: { onSaved: () => void }) {
 
     // The API rejects empty values, so only filled fields are sent
     const profile: UpdateProfileRequest = {};
-    for (const { name } of FIELDS) {
-      const value = values[name].trim();
-      if (value) profile[name] = value;
+    for (const field of FIELDS) {
+      if ("readOnly" in field) continue;
+      const value = values[field.name].trim();
+      if (value) profile[field.name] = value;
     }
 
     setPending(true);
@@ -74,19 +71,6 @@ function ProfileForm({ onSaved }: { onSaved: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2.5 px-6">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="profile-phone" className="text-sm">
-          Phone
-        </label>
-        <input
-          id="profile-phone"
-          type="tel"
-          value={user?.phone ?? ""}
-          disabled
-          className={inputClassName}
-        />
-      </div>
-
       {FIELDS.map((field) => (
         <div key={field.name} className="flex flex-col gap-1">
           <label htmlFor={`profile-${field.name}`} className="text-sm">
@@ -96,6 +80,7 @@ function ProfileForm({ onSaved }: { onSaved: () => void }) {
             id={`profile-${field.name}`}
             type={field.type}
             autoComplete={field.autoComplete}
+            disabled={"readOnly" in field}
             value={values[field.name]}
             onChange={(event) =>
               setValues((prev) => ({
@@ -136,7 +121,7 @@ export function ProfileEditSheet({
             Edit details
           </SheetTitle>
           <SheetDescription className="sr-only">
-            Update your name, email and city
+            Update your name and email
           </SheetDescription>
         </SheetHeader>
         <ProfileForm onSaved={() => onOpenChange(false)} />
