@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import type { Pizza, PizzaSize } from "@/types/pizza";
 import { getPizzaImageUrl } from "@/lib/api";
 import { PIZZA_SIZE_LABELS } from "@/lib/constants";
+import { formatLabel, getItemPrice, getItemSummary } from "@/lib/pizza-item";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cart-store";
@@ -17,12 +18,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-
-function formatLabel(slug: string): string {
-  return slug
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
 
 export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
   const [sizeType, setSizeType] = useState(pizza.sizes[0]?.type);
@@ -38,21 +33,10 @@ export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
     toppingTypes.includes(item.type),
   );
 
-  const totalPrice =
-    (size?.price ?? 0) +
-    (option?.price ?? 0) +
-    toppings.reduce((sum, topping) => sum + topping.price, 0);
+  const totalPrice = getItemPrice(size, option, toppings);
   const addItem = useCartStore((state) => state.addItem);
 
   const addToCart = () => {
-    const summaryParts = [
-      size ? `${size.volume} cm` : null,
-      option ? formatLabel(option.type) : null,
-      toppings.length > 0
-        ? toppings.map((item) => formatLabel(item.type)).join(", ")
-        : null,
-    ].filter(Boolean);
-
     addItem({
       pizzaId: pizza._id,
       category: pizza.category,
@@ -61,7 +45,7 @@ export function PizzaDetailsDialog({ pizza }: { pizza: Pizza }) {
       toppings: toppings.map((item) => item.type),
       name: pizza.name,
       img: getPizzaImageUrl(pizza.img),
-      summary: summaryParts.join(", "),
+      summary: getItemSummary(size, option, toppings),
       description: pizza.description,
       price: totalPrice,
     });
