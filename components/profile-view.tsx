@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CreditCard, Pizza, type LucideIcon } from "lucide-react";
@@ -10,12 +10,12 @@ import { LogoutButton } from "@/components/logout-button";
 import { OrderCard } from "@/components/order-card";
 import { ProfileEditSheet } from "@/components/profile-edit-sheet";
 import { Button } from "@/components/ui/button";
+import { fetchProfile } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { selectIsAuthenticated, useAuthStore } from "@/stores/auth-store";
 import { useCardStore } from "@/stores/card-store";
 import { useOrderStore } from "@/stores/order-store";
 import { useHydrated } from "@/stores/use-hydrated";
-import { useUserStore } from "@/stores/user-store";
 
 const TABS = [
   { key: "orders", label: "Orders" },
@@ -129,16 +129,26 @@ function CardsTab() {
 
 export function ProfileView() {
   // Every store shown here is restored from localStorage after mount
-  const userHydrated = useHydrated(useUserStore.persist);
   const ordersHydrated = useHydrated(useOrderStore.persist);
   const cardsHydrated = useHydrated(useCardStore.persist);
   const authHydrated = useHydrated(useAuthStore.persist);
-  const { name, email, phone } = useUserStore();
+  const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.token);
+  const setUser = useAuthStore((state) => state.setUser);
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const [tab, setTab] = useState<TabKey>("orders");
   const [editOpen, setEditOpen] = useState(false);
+  const name = [user?.firstname, user?.lastname].filter(Boolean).join(" ");
+  const email = user?.email;
+  const phone = user?.phone;
 
-  if (!userHydrated || !ordersHydrated || !cardsHydrated || !authHydrated) {
+  // The backend is the source of truth; the persisted user is shown meanwhile
+  useEffect(() => {
+    if (!authHydrated || !token) return;
+    fetchProfile(token).then(setUser, () => {});
+  }, [authHydrated, token, setUser]);
+
+  if (!ordersHydrated || !cardsHydrated || !authHydrated) {
     return null;
   }
 

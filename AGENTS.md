@@ -59,12 +59,11 @@ Pizza delivery storefront: catalog, cart, checkout with orders created on the ba
 - `stores/cart-store.ts` — Zustand `useCartStore` (items, addItem, removeItem, updateQuantity, clearCart) + `selectItemCount`/`selectTotalPrice`.
 - `stores/address-store.ts` — Zustand `useAddressStore` (address, setAddress).
 - `stores/order-store.ts` — Zustand `useOrderStore` (orders, addOrder, cancelOrder) + `isActiveOrder`. Orders are saved on successful (demo) payment.
-- `stores/user-store.ts` — Zustand `useUserStore` (name, phone, email, updateProfile, resetProfile). Still a local profile: it isn't synced with the backend `/users/profile` yet, even after sign-in.
 - `stores/card-store.ts` — Zustand `useCardStore` (cards, addCard, removeCard). Only the last 4 digits are saved, on successful payment.
-- `stores/auth-store.ts` — Zustand `useAuthStore` (token, user, setSession, signOut) + `selectIsAuthenticated`. Persisted; gates Edit profile, Log out and saved cards.
+- `stores/auth-store.ts` — Zustand `useAuthStore` (token, user, setSession, setUser, signOut) + `selectIsAuthenticated`. Persisted; `user` is the backend profile (`fetchProfile`/`updateProfile` in `lib/api.ts`, refreshed on the profile page). Gates Edit profile, Log out and saved cards.
 - `app/(standalone)/` — pages without the site header/footer, sharing one root layout: `payment`, `sign-in` (`components/sign-in-form.tsx`: phone → OTP code; codes are listed at `${NEXT_PUBLIC_API_URL}/otps`). `/sign-in?redirect=/path` returns there after sign-in.
 - `app/(site)/profile` + `components/profile-view.tsx` — profile page: orders/cards tabs, `profile-edit-sheet.tsx`, `confirm-dialog.tsx` (logout, delete card).
-- Cart, address, orders, user and cards persist to `localStorage` via `persist` with `skipHydration` and the shared `persistStorage` (`stores/storage.ts`); `components/store-rehydrate.tsx` restores them after mount. Use `useHydrated(store.persist)` (`stores/use-hydrated.ts`) before rendering persisted data.
+- Cart, address, orders and cards persist to `localStorage` via `persist` with `skipHydration` and the shared `persistStorage` (`stores/storage.ts`); `components/store-rehydrate.tsx` restores them after mount. Use `useHydrated(store.persist)` (`stores/use-hydrated.ts`) before rendering persisted data.
 - `components/catalog-context.tsx` — `CatalogProvider`/`useCatalog`: passes the server-fetched catalog to client components. Server data, not client state, so it stays a context.
 - `components/pizza-card.tsx`, `components/pizza-details-dialog.tsx` — catalog card + detail dialog.
 - `components/header.tsx`, `components/footer.tsx` — layout chrome.
