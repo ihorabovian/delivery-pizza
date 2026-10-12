@@ -4,7 +4,10 @@ import { useState, type ComponentProps } from "react";
 import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { useAddressStore } from "@/stores/address-store";
 import { useAuthStore } from "@/stores/auth-store";
+import { useCartStore } from "@/stores/cart-store";
+import { useOrderStore } from "@/stores/order-store";
 
 // Log out with a confirmation; shared by the header and the profile page
 export function LogoutButton(props: ComponentProps<typeof Button>) {
@@ -14,6 +17,10 @@ export function LogoutButton(props: ComponentProps<typeof Button>) {
 
   const handleLogout = () => {
     signOut();
+    // The next person on this browser starts clean
+    useCartStore.getState().clearCart();
+    useAddressStore.setState({ address: "", street: "", house: "" });
+    useOrderStore.setState({ orders: [] });
     router.push("/");
   };
 
