@@ -10,10 +10,11 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Payment",
+  title: "Pizza",
 };
 
-export default function PaymentLayout({
+// Full-screen pages without the site header and footer (payment, sign-in)
+export default function StandaloneLayout({
   children,
 }: {
   children: React.ReactNode;

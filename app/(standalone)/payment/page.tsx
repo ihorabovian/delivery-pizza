@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { PaymentForm } from "@/components/payment-form";
+
+export const metadata: Metadata = {
+  title: "Payment",
+};
 
 export default async function PaymentPage({
   searchParams,
