@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useAddressStore } from "@/stores/address-store";
 import { useAuthStore } from "@/stores/auth-store";
-import { useCardStore } from "@/stores/card-store";
 import { useCartStore } from "@/stores/cart-store";
 import { useOrderStore } from "@/stores/order-store";
 
@@ -14,7 +13,6 @@ export function StoreRehydrate() {
     useCartStore.persist.rehydrate();
     useAddressStore.persist.rehydrate();
     useOrderStore.persist.rehydrate();
-    useCardStore.persist.rehydrate();
     useAuthStore.persist.rehydrate();
   }, []);
 

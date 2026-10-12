@@ -5,16 +5,13 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatOrderNumber, formatPrice } from "@/lib/utils";
-import { useHydrated } from "@/stores/use-hydrated";
-import { useOrderStore } from "@/stores/order-store";
+import { useOrders } from "@/stores/use-orders";
 
 export function OrderStatus({ number }: { number: string }) {
-  const hydrated = useHydrated(useOrderStore.persist);
-  const order = useOrderStore((state) =>
-    state.orders.find((item) => item.number === number),
-  );
+  const { orders, ready } = useOrders();
+  const order = orders.find((item) => item.number === number);
 
-  if (!hydrated) return null;
+  if (!ready) return null;
 
   if (!order) {
     return (

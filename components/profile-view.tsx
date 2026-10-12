@@ -10,11 +10,12 @@ import { LogoutButton } from "@/components/logout-button";
 import { OrderCard } from "@/components/order-card";
 import { ProfileEditSheet } from "@/components/profile-edit-sheet";
 import { Button } from "@/components/ui/button";
-import { fetchProfile } from "@/lib/api";
+import { toast } from "sonner";
+import { deleteCard, fetchCards, fetchProfile } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { selectIsAuthenticated, useAuthStore } from "@/stores/auth-store";
-import { useCardStore } from "@/stores/card-store";
-import { useOrderStore } from "@/stores/order-store";
+import { useOrders } from "@/stores/use-orders";
+import type { SavedCard } from "@/types/card";
 import { useHydrated } from "@/stores/use-hydrated";
 
 const TABS = [
@@ -47,7 +48,9 @@ function EmptyState({
 }
 
 function OrdersTab() {
-  const orders = useOrderStore((state) => state.orders);
+  const { orders, ready } = useOrders();
+
+  if (!ready) return null;
 
   if (orders.length === 0) {
     return (
@@ -71,10 +74,53 @@ function OrdersTab() {
 }
 
 function CardsTab() {
+  const token = useAuthStore((state) => state.token);
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
-  const cards = useCardStore((state) => state.cards);
-  const removeCard = useCardStore((state) => state.removeCard);
+  // Tagged with the token so a previous account's cards are never shown
+  const [loaded, setLoaded] = useState<{
+    token: string;
+    cards: SavedCard[];
+  } | null>(null);
   const [cardToDelete, setCardToDelete] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!token) return;
+
+    let cancelled = false;
+    fetchCards(token)
+      .catch((error: Error) => {
+        toast.error(error.message);
+        return [];
+      })
+      .then((cards) => {
+        if (!cancelled) setLoaded({ token, cards });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  const cards = loaded?.token === token ? loaded.cards : null;
+
+  const removeCard = async (id: string) => {
+    if (!token) return;
+
+    try {
+      await deleteCard(token, id);
+      setLoaded(
+        (prev) =>
+          prev && {
+            ...prev,
+            cards: prev.cards.filter((card) => card._id !== id),
+          },
+      );
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
+
+  if (isAuthenticated && !cards) return null;
 
   return (
     <section className="flex w-full flex-col gap-4">
@@ -86,7 +132,7 @@ function CardsTab() {
           title="Sign in to use saved cards"
           text="Saved cards are available only in your account"
         />
-      ) : cards.length === 0 ? (
+      ) : !cards || cards.length === 0 ? (
         <EmptyState
           icon={CreditCard}
           title="No saved cards"
@@ -95,18 +141,18 @@ function CardsTab() {
       ) : (
         <ul className="flex flex-wrap gap-4">
           {cards.map((card) => (
-            <li key={card.id} className="flex w-32.5 flex-col gap-2">
+            <li key={card._id} className="flex w-32.5 flex-col gap-2">
               <div className="relative h-18 rounded-xl bg-linear-to-tr from-[#f9b49c] to-brand p-2">
                 <span className="rounded-full bg-black px-2 py-0.5 text-xs font-extrabold text-white">
                   jB
                 </span>
                 <span className="absolute right-2 bottom-2 text-white">
-                  *{card.last4}
+                  *{card.panMasked}
                 </span>
               </div>
               <Button
                 variant="secondary"
-                onClick={() => setCardToDelete(card.id)}
+                onClick={() => setCardToDelete(card._id)}
                 className="h-8 w-full cursor-pointer rounded-full"
               >
                 Delete card
@@ -129,8 +175,6 @@ function CardsTab() {
 
 export function ProfileView() {
   // Every store shown here is restored from localStorage after mount
-  const ordersHydrated = useHydrated(useOrderStore.persist);
-  const cardsHydrated = useHydrated(useCardStore.persist);
   const authHydrated = useHydrated(useAuthStore.persist);
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
@@ -148,7 +192,7 @@ export function ProfileView() {
     fetchProfile(token).then(setUser, () => {});
   }, [authHydrated, token, setUser]);
 
-  if (!ordersHydrated || !cardsHydrated || !authHydrated) {
+  if (!authHydrated) {
     return null;
   }
 

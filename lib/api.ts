@@ -1,4 +1,5 @@
 import type { Pizza, PizzaCategory } from "@/types/pizza";
+import type { SavedCard } from "@/types/card";
 import type {
   AuthUser,
   SignInResponse,
@@ -71,6 +72,28 @@ export async function createPizzaPayment(
   return data.order;
 }
 
+// Paying the order's transaction moves the order out of "awaiting_payment";
+// only then the backend lists it. A new card is saved to the order's phone.
+export async function payTransaction(request: {
+  transactionId: string;
+  pan: string;
+  expireDate: string;
+  cvv: string;
+  saveCard: boolean;
+}): Promise<void> {
+  const response = await fetch(`${API_URL}/transactions/pay`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...request, method: "new_card" }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(getErrorMessage(data) || "Payment failed");
+  }
+}
+
 // Sends a one-time code to the phone; resolves with the resend delay in ms.
 // The code itself is shown on the backend's OTP codes page (see OTP_CODES_URL).
 export async function requestOtp(phone: string): Promise<number> {
@@ -123,7 +146,10 @@ export async function signOut(token: string): Promise<void> {
 export const OTP_CODES_URL = `${API_URL}/otps`;
 
 // Business errors come as `reason`, validation errors as `message` (string or string[])
-function getErrorMessage(data: { reason?: string; message?: string | string[] }) {
+function getErrorMessage(data: {
+  reason?: string;
+  message?: string | string[];
+}) {
   return data.reason ?? [data.message].flat().join(", ");
 }
 
@@ -144,15 +170,21 @@ export function groupPizzasByCategory(
   return groups;
 }
 
-async function requestProfile(
+// Same-origin proxy to the API (see next.config.ts); authorized requests
+// include PATCH and DELETE, which the API's CORS doesn't allow
+const PROXY_URL = "/backend";
+
+async function requestAuthorized(
   token: string,
+  path: string,
   init: RequestInit,
   fallbackMessage: string,
-): Promise<AuthUser> {
-  const response = await fetch(`${API_URL}/users/profile`, {
+) {
+  const response = await fetch(`${PROXY_URL}${path}`, {
     ...init,
     headers: {
-      "Content-Type": "application/json",
+      // The API rejects a JSON content type without a body (cancel, delete)
+      ...(init.body ? { "Content-Type": "application/json" } : {}),
       ...AUTH_CLIENT_HEADERS,
       Authorization: `Bearer ${token}`,
     },
@@ -164,20 +196,70 @@ async function requestProfile(
     throw new Error(getErrorMessage(data) || fallbackMessage);
   }
 
+  return data;
+}
+
+export async function fetchProfile(token: string): Promise<AuthUser> {
+  const data = await requestAuthorized(
+    token,
+    "/users/profile",
+    {},
+    "Failed to load profile",
+  );
   return data.user;
 }
 
-export function fetchProfile(token: string): Promise<AuthUser> {
-  return requestProfile(token, {}, "Failed to load profile");
-}
-
-export function updateProfile(
+export async function updateProfile(
   token: string,
   profile: UpdateProfileRequest,
 ): Promise<AuthUser> {
-  return requestProfile(
+  const data = await requestAuthorized(
     token,
+    "/users/profile",
     { method: "PATCH", body: JSON.stringify(profile) },
     "Failed to update profile",
+  );
+  return data.user;
+}
+
+export async function fetchPizzaOrders(token: string): Promise<PizzaOrder[]> {
+  const data = await requestAuthorized(
+    token,
+    "/pizzas/orders",
+    {},
+    "Failed to load orders",
+  );
+  return data.orders;
+}
+
+export async function cancelPizzaOrder(
+  token: string,
+  orderId: string,
+): Promise<PizzaOrder> {
+  const data = await requestAuthorized(
+    token,
+    `/pizzas/orders/${orderId}/cancel`,
+    { method: "PATCH" },
+    "Failed to cancel order",
+  );
+  return data.order;
+}
+
+export async function fetchCards(token: string): Promise<SavedCard[]> {
+  const data = await requestAuthorized(
+    token,
+    "/cards/cards",
+    {},
+    "Failed to load cards",
+  );
+  return data.cards;
+}
+
+export async function deleteCard(token: string, id: string): Promise<void> {
+  await requestAuthorized(
+    token,
+    `/cards/cards/${id}`,
+    { method: "DELETE" },
+    "Failed to delete card",
   );
 }

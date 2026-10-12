@@ -9,8 +9,10 @@ export type Order = {
   total: number;
   address: string;
   createdAt: string;
-  // Orders saved before cancelling existed have no status; they count as active
-  status?: "active" | "cancelled";
+  // Backend orders always have a status; local guest orders only once cancelled
+  status?: "active" | "delivered" | "cancelled";
+  // Set for backend orders; local ones can always be cancelled
+  cancellable?: boolean;
 };
 
 type OrderState = {
@@ -19,13 +21,14 @@ type OrderState = {
   cancelOrder: (number: string) => void;
 };
 
-// No real delivery tracking yet: an order counts as active for an hour
-// after it was placed, then moves to history
+// Local guest orders have no delivery tracking: one counts as active for an
+// hour after it was placed, then moves to history
 const ACTIVE_ORDER_MS = 60 * 60 * 1000;
 
 export const isActiveOrder = (order: Order) =>
-  order.status !== "cancelled" &&
-  Date.now() - Date.parse(order.createdAt) < ACTIVE_ORDER_MS;
+  order.status
+    ? order.status === "active"
+    : Date.now() - Date.parse(order.createdAt) < ACTIVE_ORDER_MS;
 
 export const useOrderStore = create<OrderState>()(
   persist(

@@ -5,11 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import pizzaIcon from "@/app/icon.png";
 import { Button } from "@/components/ui/button";
+import { payTransaction } from "@/lib/api";
 import { formatOrderNumber, formatPrice } from "@/lib/utils";
 import { Check } from "lucide-react";
 import { useAddressStore } from "@/stores/address-store";
 import { selectIsAuthenticated, useAuthStore } from "@/stores/auth-store";
-import { useCardStore } from "@/stores/card-store";
 import { useCartStore } from "@/stores/cart-store";
 import { useOrderStore } from "@/stores/order-store";
 
@@ -32,26 +32,50 @@ const inputClassName =
 export function PaymentForm({
   amount,
   orderNumber,
+  transactionId,
+  saveCard,
 }: {
   amount: number;
   orderNumber: string;
+  transactionId: string;
+  saveCard: boolean;
 }) {
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
   const [paying, setPaying] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const isValid =
     cardNumber.replace(/\s/g, "").length >= 8 &&
     expiry.length === 5 &&
     cvv.length >= 3;
 
-  // The order is created on the backend at checkout; the card charge itself is still simulated
-  const handlePay = () => {
+  // The card itself is a mock: the backend accepts any number
+  const handlePay = async () => {
     setPaying(true);
-    setTimeout(() => {
-      const { items, clearCart } = useCartStore.getState();
+    setError(null);
+    const isAuthenticated = selectIsAuthenticated(useAuthStore.getState());
+
+    try {
+      await payTransaction({
+        transactionId,
+        pan: cardNumber.replace(/\s/g, ""),
+        expireDate: expiry,
+        cvv,
+        // Cards are saved to the account, so guests' cards are not kept
+        saveCard: saveCard && isAuthenticated,
+      });
+    } catch (error) {
+      setError((error as Error).message);
+      setPaying(false);
+      return;
+    }
+
+    const { items, clearCart } = useCartStore.getState();
+    // Signed-in users get their orders from the backend; only guests keep them here
+    if (!isAuthenticated) {
       useOrderStore.getState().addOrder({
         number: orderNumber,
         items,
@@ -59,13 +83,9 @@ export function PaymentForm({
         address: useAddressStore.getState().address,
         createdAt: new Date().toISOString(),
       });
-      // Cards are saved to the account, so guests' cards are not kept
-      if (selectIsAuthenticated(useAuthStore.getState())) {
-        useCardStore.getState().addCard(cardNumber.replace(/\s/g, "").slice(-4));
-      }
-      clearCart();
-      setPaid(true);
-    }, 1000);
+    }
+    clearCart();
+    setPaid(true);
   };
 
   if (paid) {
@@ -86,16 +106,24 @@ export function PaymentForm({
               <span className="text-sm text-muted-foreground">Service</span>
               <div className="flex items-center gap-1">
                 <Image src={pizzaIcon} alt="" className="size-6" aria-hidden />
-                <span className="text-base font-extrabold uppercase">Pizza</span>
+                <span className="text-base font-extrabold uppercase">
+                  Pizza
+                </span>
               </div>
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm text-muted-foreground">Amount</span>
-              <span className="text-2xl font-normal">{formatPrice(amount)}</span>
+              <span className="text-2xl font-normal">
+                {formatPrice(amount)}
+              </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-sm text-muted-foreground">Order number</span>
-              <span className="text-base">{formatOrderNumber(orderNumber)}</span>
+              <span className="text-sm text-muted-foreground">
+                Order number
+              </span>
+              <span className="text-base">
+                {formatOrderNumber(orderNumber)}
+              </span>
             </div>
           </div>
         </div>
@@ -137,7 +165,9 @@ export function PaymentForm({
 
       <div className="mt-6 flex flex-col gap-1">
         <span className="text-sm text-muted-foreground">Order number</span>
-        <span className="text-2xl font-bold">{formatOrderNumber(orderNumber)}</span>
+        <span className="text-2xl font-bold">
+          {formatOrderNumber(orderNumber)}
+        </span>
       </div>
 
       <div className="mt-6 flex flex-col gap-4 rounded-3xl bg-muted/50 p-6">
@@ -166,9 +196,7 @@ export function PaymentForm({
             <input
               id="expiry"
               value={expiry}
-              onChange={(event) =>
-                setExpiry(formatExpiry(event.target.value))
-              }
+              onChange={(event) => setExpiry(formatExpiry(event.target.value))}
               placeholder="00/00"
               inputMode="numeric"
               autoComplete="cc-exp"
@@ -202,6 +230,10 @@ export function PaymentForm({
       >
         {paying ? "Processing…" : `Pay ${formatPrice(amount)}`}
       </Button>
+
+      {error && (
+        <p className="mt-4 text-center text-sm text-destructive">{error}</p>
+      )}
 
       <p className="mt-4 text-center text-sm text-muted-foreground">
         This is a demo payment. No money will be charged.

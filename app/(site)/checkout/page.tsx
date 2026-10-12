@@ -75,10 +75,11 @@ export default function CheckoutPage() {
   const itemCount = useCartStore(selectItemCount);
   const totalPrice = useCartStore(selectTotalPrice);
   const { address, street, house, setAddress } = useAddressStore();
-  // Signed-in users get the profile phone until they type another one
+  // The backend links orders to an account by phone, so signed-in users
+  // always order with their profile phone
   const profilePhone = useAuthStore((state) => state.user?.phone);
-  const [typedPhone, setPhone] = useState<string | null>(null);
-  const phone = typedPhone ?? profilePhone ?? "";
+  const [typedPhone, setPhone] = useState("");
+  const phone = profilePhone ?? typedPhone;
   const phoneDigits = phone.replace(/\D/g, "");
   // Taken once per visit, not at module load, so it stays current between visits
   const [orderDate] = useState(() => formatDate(new Date()));
@@ -143,7 +144,13 @@ export default function CheckoutPage() {
           comment: "",
         },
       });
-      router.push(`/payment?amount=${order.totalPrice}&order=${order._id}`);
+      const params = new URLSearchParams({
+        amount: String(order.totalPrice),
+        order: order._id,
+        transaction: order.transactionId ?? "",
+      });
+      if (payWithoutSaving) params.set("save", "0");
+      router.push(`/payment?${params}`);
     } catch (error) {
       setPlaceError((error as Error).message);
       setPlacing(false);
@@ -162,11 +169,7 @@ export default function CheckoutPage() {
         <p className="text-muted-foreground">
           Add something from the menu before checking out.
         </p>
-        <Button
-          variant="brand"
-          size="xl"
-          asChild
-        >
+        <Button variant="brand" size="xl" asChild>
           <Link href="/">Back to menu</Link>
         </Button>
       </main>
@@ -250,6 +253,7 @@ export default function CheckoutPage() {
                 id="phone"
                 type="tel"
                 value={phone}
+                disabled={!!profilePhone}
                 onChange={(event) => setPhone(event.target.value)}
                 placeholder="+1"
                 className="w-full max-w-xs rounded-full border border-border bg-background py-2.5 px-4 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -372,9 +376,7 @@ export default function CheckoutPage() {
                 <Check className="size-3 text-primary-foreground" />
               )}
             </span>
-            <span className="text-base font-medium">
-              Don&apos;t save card
-            </span>
+            <span className="text-base font-medium">Don&apos;t save card</span>
           </button>
 
           <div className="flex flex-col items-center gap-2">
