@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { OTP_CODES_URL, requestOtp, signIn } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
-import { useUserStore } from "@/stores/user-store";
 
 const inputClassName =
   "h-10 w-full rounded-full border border-border bg-background px-4 text-xl outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -37,7 +36,6 @@ function BackButton({
 export function SignInForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
   const setSession = useAuthStore((state) => state.setSession);
-  const setProfilePhone = useUserStore((state) => state.setPhone);
   const [step, setStep] = useState<"phone" | "code">("phone");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
@@ -84,7 +82,6 @@ export function SignInForm({ redirectTo }: { redirectTo: string }) {
     try {
       const { token, user } = await signIn(phoneDigits, Number(code));
       setSession(token, user);
-      setProfilePhone(phone.trim());
       router.replace(redirectTo);
     } catch (error) {
       setError((error as Error).message);

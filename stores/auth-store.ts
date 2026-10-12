@@ -8,6 +8,7 @@ type AuthState = {
   token: string | null;
   user: AuthUser | null;
   setSession: (token: string, user: AuthUser) => void;
+  setUser: (user: AuthUser) => void;
   signOut: () => Promise<void>;
 };
 
@@ -18,6 +19,8 @@ export const useAuthStore = create<AuthState>()(
       user: null,
 
       setSession: (token, user) => set({ token, user }),
+
+      setUser: (user) => set({ user }),
 
       signOut: async () => {
         const { token } = get();

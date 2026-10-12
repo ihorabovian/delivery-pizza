@@ -7,13 +7,13 @@ import Image from "next/image";
 import { ChevronRight, Check, Plus } from "lucide-react";
 import { AddressSelect } from "@/components/address-select";
 import { useAddressStore } from "@/stores/address-store";
+import { useAuthStore } from "@/stores/auth-store";
 import {
   selectItemCount,
   selectTotalPrice,
   useCartStore,
 } from "@/stores/cart-store";
 import { useHydrated } from "@/stores/use-hydrated";
-import { useUserStore } from "@/stores/user-store";
 import { Button } from "@/components/ui/button";
 import { calculatePizzaOrder, createPizzaPayment } from "@/lib/api";
 import { cn, formatDate, formatPrice } from "@/lib/utils";
@@ -75,8 +75,10 @@ export default function CheckoutPage() {
   const itemCount = useCartStore(selectItemCount);
   const totalPrice = useCartStore(selectTotalPrice);
   const { address, street, house, setAddress } = useAddressStore();
-  // Phone lives in the persisted profile, so it survives leaving the checkout
-  const { phone, setPhone } = useUserStore();
+  // Signed-in users get the profile phone until they type another one
+  const profilePhone = useAuthStore((state) => state.user?.phone);
+  const [typedPhone, setPhone] = useState<string | null>(null);
+  const phone = typedPhone ?? profilePhone ?? "";
   const phoneDigits = phone.replace(/\D/g, "");
   // Taken once per visit, not at module load, so it stays current between visits
   const [orderDate] = useState(() => formatDate(new Date()));

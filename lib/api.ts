@@ -1,5 +1,9 @@
 import type { Pizza, PizzaCategory } from "@/types/pizza";
-import type { SignInResponse } from "@/types/auth";
+import type {
+  AuthUser,
+  SignInResponse,
+  UpdateProfileRequest,
+} from "@/types/auth";
 import type {
   CalculateOrderResponse,
   CreatePizzaPaymentRequest,
@@ -138,4 +142,42 @@ export function groupPizzasByCategory(
   }
 
   return groups;
+}
+
+async function requestProfile(
+  token: string,
+  init: RequestInit,
+  fallbackMessage: string,
+): Promise<AuthUser> {
+  const response = await fetch(`${API_URL}/users/profile`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...AUTH_CLIENT_HEADERS,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(getErrorMessage(data) || fallbackMessage);
+  }
+
+  return data.user;
+}
+
+export function fetchProfile(token: string): Promise<AuthUser> {
+  return requestProfile(token, {}, "Failed to load profile");
+}
+
+export function updateProfile(
+  token: string,
+  profile: UpdateProfileRequest,
+): Promise<AuthUser> {
+  return requestProfile(
+    token,
+    { method: "PATCH", body: JSON.stringify(profile) },
+    "Failed to update profile",
+  );
 }

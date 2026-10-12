@@ -10,37 +10,83 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useUserStore, type UserProfile } from "@/stores/user-store";
+import { updateProfile } from "@/lib/api";
+import { useAuthStore } from "@/stores/auth-store";
+import type { UpdateProfileRequest } from "@/types/auth";
 
 const FIELDS = [
-  { name: "name", label: "Name", type: "text", autoComplete: "given-name" },
-  { name: "phone", label: "Phone", type: "tel", autoComplete: "tel" },
+  {
+    name: "firstname",
+    label: "First name",
+    type: "text",
+    autoComplete: "given-name",
+  },
+  {
+    name: "middlename",
+    label: "Middle name",
+    type: "text",
+    autoComplete: "additional-name",
+  },
+  {
+    name: "lastname",
+    label: "Last name",
+    type: "text",
+    autoComplete: "family-name",
+  },
   { name: "email", label: "Email", type: "email", autoComplete: "email" },
+  { name: "city", label: "City", type: "text", autoComplete: "address-level2" },
 ] as const;
 
 const inputClassName =
-  "w-full rounded-full border border-border bg-background px-4 py-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+  "w-full rounded-full border border-border bg-background px-4 py-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:text-muted-foreground";
 
 // Mounted only while the sheet is open, so it starts from the saved profile each time
 function ProfileForm({ onSaved }: { onSaved: () => void }) {
-  const [values, setValues] = useState<UserProfile>(() => {
-    const { name, phone, email } = useUserStore.getState();
-    return { name, phone, email };
-  });
+  const user = useAuthStore((state) => state.user);
+  const [values, setValues] = useState(() =>
+    Object.fromEntries(FIELDS.map(({ name }) => [name, user?.[name] ?? ""])),
+  );
+  const [pending, setPending] = useState(false);
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    useUserStore.getState().updateProfile({
-      name: values.name.trim(),
-      phone: values.phone.trim(),
-      email: values.email.trim(),
-    });
-    toast.success("Details updated");
-    onSaved();
+    const { token, setUser } = useAuthStore.getState();
+    if (!token || pending) return;
+
+    // The API rejects empty values, so only filled fields are sent
+    const profile: UpdateProfileRequest = {};
+    for (const { name } of FIELDS) {
+      const value = values[name].trim();
+      if (value) profile[name] = value;
+    }
+
+    setPending(true);
+    try {
+      setUser(await updateProfile(token, profile));
+      toast.success("Details updated");
+      onSaved();
+    } catch (error) {
+      toast.error((error as Error).message);
+    } finally {
+      setPending(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2.5 px-6">
+      <div className="flex flex-col gap-1">
+        <label htmlFor="profile-phone" className="text-sm">
+          Phone
+        </label>
+        <input
+          id="profile-phone"
+          type="tel"
+          value={user?.phone ?? ""}
+          disabled
+          className={inputClassName}
+        />
+      </div>
+
       {FIELDS.map((field) => (
         <div key={field.name} className="flex flex-col gap-1">
           <label htmlFor={`profile-${field.name}`} className="text-sm">
@@ -66,6 +112,7 @@ function ProfileForm({ onSaved }: { onSaved: () => void }) {
         type="submit"
         variant="secondary"
         size="xl"
+        disabled={pending}
         className="mt-4 w-full"
       >
         Update details
@@ -89,7 +136,7 @@ export function ProfileEditSheet({
             Edit details
           </SheetTitle>
           <SheetDescription className="sr-only">
-            Update your name, phone and email
+            Update your name, email and city
           </SheetDescription>
         </SheetHeader>
         <ProfileForm onSaved={() => onOpenChange(false)} />
