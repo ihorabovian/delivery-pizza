@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
         hostname: "juniorsbootcamp.ru",
         pathname: "/api/**",
       },
+      {
+        protocol: "https",
+        hostname: "juniorbootcamp-backend.onrender.com",
+        pathname: "/api/**",
+      },
     ],
   },
 };
