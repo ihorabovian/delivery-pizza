@@ -62,6 +62,10 @@ The dev server runs at http://localhost:3003.
 
 > The backend runs on a free Render plan, so the first request after a pause can take up to a minute.
 
+### Getting a sign-in code
+
+Sign-in needs a one-time code. The backend creates it when you request one, and the list of codes is available at https://juniorbootcamp-backend.onrender.com/api/otps. Open that link to get the code for the phone number you entered.
+
 ## Scripts
 
 | Command                | Description                  |
