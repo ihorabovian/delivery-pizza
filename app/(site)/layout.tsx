@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import "../globals.css";
 import { StoreRehydrate } from "@/components/store-rehydrate";
 import { CatalogProvider } from "@/components/catalog-context";
+import { CartCatalogSync } from "@/components/cart-catalog-sync";
 import { Toaster } from "@/components/ui/sonner";
 import { fetchPizzaCatalog } from "@/lib/api";
 
@@ -39,6 +40,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col pb-24 sm:pb-0">
         <CatalogProvider catalog={catalog}>
           <StoreRehydrate />
+          <CartCatalogSync />
           <SiteHeader />
           {children}
           <SiteFooter />

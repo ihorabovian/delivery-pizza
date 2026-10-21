@@ -11,6 +11,7 @@ type CartState = {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  removeMissingItems: (productIds: Set<string>) => void;
 };
 
 export const useCartStore = create<CartState>()(
@@ -39,6 +40,11 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: () => set({ items: [] }),
+
+      removeMissingItems: (productIds) => {
+        const items = get().items.filter((item) => productIds.has(item.pizzaId));
+        if (items.length !== get().items.length) set({ items });
+      },
     }),
     {
       name: "cart",
